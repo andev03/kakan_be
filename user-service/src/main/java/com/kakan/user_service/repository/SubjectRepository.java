@@ -1,0 +1,7 @@
+package com.kakan.user_service.repository;
+
+import com.kakan.user_service.pojo.Subject;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SubjectRepository extends JpaRepository<Subject, Integer> {
+}
