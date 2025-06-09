@@ -16,12 +16,16 @@ VALUES
 -- subject
 INSERT INTO subject (subject_name)
 VALUES
-  ('mathematics'),
-  ('literature'),
-  ('english'),
-  ('physics'),
-  ('chemistry'),
-  ('biology');
+  ('toán học'),
+  ('ngữ văn'),
+  ('ngoại ngữ'),
+  ('vật lý'),
+  ('hóa học'),
+  ('sinh học'),
+  ('lịch sử'),
+  ('địa lý'),
+  ('công nghệ'),
+  ('tin học');
 
 -- score
 INSERT INTO score (subject_id, account_id, score_year_10, score_year_11, score_year_12)
