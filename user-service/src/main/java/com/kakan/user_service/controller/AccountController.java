@@ -20,8 +20,8 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @GetMapping("/test")
-    public ResponseDto responseDto(){
-        return accountService.responses();
-    }
+//    @GetMapping("/test")
+//    public ResponseDto responseDto(){
+//        return accountService.responses();
+//    }
 }
