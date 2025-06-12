@@ -3,31 +3,13 @@ server:
 spring:
   application:
     name: school-service
-  datasource:
-    url: jdbc:postgresql://localhost:5432/school_service_db
-    username: postgres
-    password: 12345
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/university_service_db
+      database: universityDB
   main:
     banner-mode: off
     lazy-initialization: true
-  jpa:
-    properties:
-      hibernate:
-        format_sql: true
-    show-sql: true
-  sql:
-    init:
-      mode: always
-
-logging:
-  level:
-    root: warn
-    org:
-      hibernate:
-        SQL: trace
-        orm:
-          jdbc:
-            bind: trace
 
 springdoc:
   swagger-ui:
