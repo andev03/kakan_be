@@ -1,7 +1,7 @@
 -- Drop ENUM types nếu tồn tại (để tránh lỗi khi chạy lại)
 DROP TYPE IF EXISTS transaction_status CASCADE;
 DROP TYPE IF EXISTS order_status CASCADE;
-DROP TYPE IF EXISTS account_role CASCADE;
+
 
 -- Drop bảng nếu tồn tại (có CASCADE để xóa các ràng buộc)
 DROP TABLE IF EXISTS "transaction" CASCADE;
@@ -11,12 +11,7 @@ DROP TABLE IF EXISTS subject CASCADE;
 DROP TABLE IF EXISTS user_information CASCADE;
 DROP TABLE IF EXISTS account CASCADE;
 
--- Tạo ENUM types
-CREATE TYPE account_role AS ENUM (
-  'STUDENT',
-  'SCHOOL',
-  'ADMIN'
-);
+
 
 CREATE TYPE order_status AS ENUM (
   'PENDING',
@@ -38,7 +33,7 @@ CREATE TABLE account (
   password    VARCHAR(255)     NOT NULL,
   full_name   VARCHAR(50)      NOT NULL,
   is_active   BOOLEAN          NOT NULL DEFAULT TRUE,
-  role        account_role     NOT NULL,
+  role        VARCHAR(50)     NOT NULL,
   create_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
