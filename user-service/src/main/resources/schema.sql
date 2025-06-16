@@ -1,7 +1,7 @@
 -- Drop ENUM types nếu tồn tại (để tránh lỗi khi chạy lại)
 DROP TYPE IF EXISTS transaction_status CASCADE;
 DROP TYPE IF EXISTS order_status CASCADE;
-DROP TYPE IF EXISTS account_role CASCADE;
+
 
 -- Drop bảng nếu tồn tại (có CASCADE để xóa các ràng buộc)
 DROP TABLE IF EXISTS "transaction" CASCADE;
@@ -11,12 +11,7 @@ DROP TABLE IF EXISTS subject CASCADE;
 DROP TABLE IF EXISTS user_information CASCADE;
 DROP TABLE IF EXISTS account CASCADE;
 
--- Tạo ENUM types
-CREATE TYPE account_role AS ENUM (
-  'STUDENT',
-  'SCHOOL',
-  'ADMIN'
-);
+
 
 CREATE TYPE order_status AS ENUM (
   'PENDING',
@@ -34,11 +29,11 @@ CREATE TYPE transaction_status AS ENUM (
 -- Tạo bảng account
 CREATE TABLE account (
   id          SERIAL           PRIMARY KEY,
+  user_name   VARCHAR(255)      NOT NULL UNIQUE,
   email       VARCHAR(255)     NOT NULL UNIQUE,
   password    VARCHAR(255)     NOT NULL,
-  full_name   VARCHAR(50)      NOT NULL,
   is_active   BOOLEAN          NOT NULL DEFAULT TRUE,
-  role        account_role     NOT NULL,
+  role        VARCHAR(50)     NOT NULL,
   create_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
@@ -46,6 +41,7 @@ CREATE TABLE account (
 CREATE TABLE user_information (
   user_id     SERIAL           PRIMARY KEY,
   account_id  INTEGER          NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  full_name   VARCHAR(50)      NOT NULL,
   gender      BOOLEAN          NOT NULL,
   dob         DATE             NOT NULL,
   phone       VARCHAR(20),
@@ -67,6 +63,7 @@ CREATE TABLE score (
   score_year_10 NUMERIC(4,2),
   score_year_11 NUMERIC(4,2),
   score_year_12 NUMERIC(4,2),
+  gpa           NUMERIC(4,2),
   CONSTRAINT uq_score_account_subject UNIQUE (account_id, subject_id)
 );
 

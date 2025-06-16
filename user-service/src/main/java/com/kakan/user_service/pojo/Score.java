@@ -1,6 +1,8 @@
 package com.kakan.user_service.pojo;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,5 +35,8 @@ public class Score {
 
     @Column(name = "score_year_12")
     private Double scoreYear12;
+
+    @Column(name = "gpa")
+    private Double gpa;
 
 }

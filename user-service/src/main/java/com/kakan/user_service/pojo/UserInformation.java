@@ -21,6 +21,9 @@ public class UserInformation {
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
+    @Column(name = "full_name", length = 50)
+    private String fullName;
+
     @Column(nullable = false)
     private Boolean gender;
 
