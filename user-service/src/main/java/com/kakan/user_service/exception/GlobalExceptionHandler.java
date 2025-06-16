@@ -56,4 +56,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleExpiredJwtException(ExpiredJwtException exception) {
         return new ResponseEntity<>("Token đã hết hạn, vui lòng đăng nhập lại.", HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(FuncErrorException.class)
+    public ResponseEntity<String> handleFuncErrorException(FuncErrorException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
