@@ -1,6 +1,8 @@
 package com.kakan.user_service.pojo;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 

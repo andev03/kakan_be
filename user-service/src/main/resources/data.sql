@@ -1,27 +1,38 @@
 -- Dữ liệu mẫu
 
 -- account
+--password alice: password: hashed_pwd_1
+--password bob: password: hashed_pwd_2
+--password nhatan: password: hashed_pwd_3
+--password admin: password: hashed_pwd_4
+
 INSERT INTO account (email, password, full_name, is_active, role)
 VALUES
-  ('alice@example.com', 'hashed_pwd_1', 'Alice Nguyen', TRUE, 'STUDENT'),
-  ('bob@example.com',   'hashed_pwd_2', 'Bob Tran',    TRUE, 'STUDENT'),
-  ('admin@mysite.com',  'hashed_pwd_3', 'Admin User',  TRUE, 'ADMIN');
+  ('alice@example.com', '$2a$12$FsEQT3Zw0PeNv7iW5jmsF.6BZ70WKzIkdpqThESAnE.G2FhgvVoy6', 'Alice Nguyen', TRUE, 'STUDENT'),
+  ('bob@example.com',   '$2a$12$hgpOZw7bTi1Ky796XgJDMOsjh4oWeSRkaHVn71EgeO1xc4rA/TeGG', 'Bob Tran',    TRUE, 'STUDENT'),
+  ('nhatan@example.com', '$2a$12$s0oTQbQkFQvW96GtQBsFbunQ7SkfqYikaw9LuLZp3Sq1QhYniVnJu', 'Nguyen Hoang Nhat An', TRUE, 'STUDENT'),
+  ('admin@mysite.com',  '$2a$12$F9xihGUaaA9eyKkdAOVwwOhUZkzEjQP0WzbR8HCUWraeE/7.fLIci', 'Admin User',  TRUE, 'ADMIN');
 
 -- user_information
 INSERT INTO user_information (account_id, gender, dob, phone, address, avatar_url)
 VALUES
   (1, FALSE, '2005-03-15', '0123456789', '123 Đường A, Quận 1, TP.HCM', 'https://example.com/avatar/alice.jpg'),
-  (2, TRUE,  '1985-10-20', '0987654321', '456 Đường B, Quận 3, TP.HCM', NULL);
+  (2, TRUE,  '1985-10-20', '0987654321', '456 Đường B, Quận 3, TP.HCM', NULL),
+  (3, TRUE, '2004-08-20', '0901922117', '789 Đường C, Quận 5, TP.HCM', 'https://example.com/avatar/nhatan.jpg');
 
 -- subject
 INSERT INTO subject (subject_name)
 VALUES
-  ('mathematics'),
-  ('literature'),
-  ('english'),
-  ('physics'),
-  ('chemistry'),
-  ('biology');
+  ('toán học'),
+  ('ngữ văn'),
+  ('ngoại ngữ'),
+  ('vật lý'),
+  ('hóa học'),
+  ('sinh học'),
+  ('lịch sử'),
+  ('địa lý'),
+  ('công nghệ'),
+  ('tin học');
 
 -- score
 INSERT INTO score (subject_id, account_id, score_year_10, score_year_11, score_year_12)
