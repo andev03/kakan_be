@@ -19,9 +19,13 @@ spring:
       hibernate:
         format_sql: true
     show-sql: true
-  sql:
-    init:
-      mode: always
+#  sql:
+#    init:
+#      mode: always
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 
 logging:
