@@ -25,10 +25,10 @@ public class AuthenticationServiceImpl implements UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Account account = accountRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        Account account = accountRepository.findAccountByUserName(userName);
         if (account == null){
-            throw new UsernameNotFoundException("User not found with email: " + email);
+            throw new UsernameNotFoundException("User not found with email: " + userName);
         }
         return new UserPrincipal(account);
     }

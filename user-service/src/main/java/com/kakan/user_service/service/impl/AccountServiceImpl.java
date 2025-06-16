@@ -4,9 +4,12 @@ import com.kakan.user_service.dto.request.LoginRequest;
 import com.kakan.user_service.dto.request.RegisterRequest;
 import com.kakan.user_service.dto.response.AccountResponse;
 import com.kakan.user_service.enums.AccountRole;
+import com.kakan.user_service.exception.DuplicateEntity;
 import com.kakan.user_service.model.UserPrincipal;
 import com.kakan.user_service.pojo.Account;
+import com.kakan.user_service.pojo.UserInformation;
 import com.kakan.user_service.repository.AccountRepository;
+import com.kakan.user_service.repository.UserInformationRepository;
 import com.kakan.user_service.service.AccountService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.NotFoundException;
@@ -22,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -33,7 +37,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     ModelMapper modelMapper;
-    @Autowired AccountRepository accountRepository;
+    @Autowired
+    AccountRepository accountRepository;
+
+    @Autowired
+    UserInformationRepository userInformationRepository;
 
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
@@ -51,19 +59,22 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public AccountResponse register (RegisterRequest registerRequest) {
-        // Kiểm tra confirmPassword trước khi tiếp tục
-        if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
-            throw new IllegalArgumentException("Mật khẩu và xác nhận mật khẩu không khớp!");
-        }
-        // Kiểm tra trùng lặp email và username trước khi lưu vào cơ sở dữ liệu
-        if (accountRepository.existsByEmail(registerRequest.getEmail())) {
-            System.out.println("Email này đã được sử dụng!");
-        }
+        try {
+            // Kiểm tra confirmPassword trước khi tiếp tục
+            if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+                throw new IllegalArgumentException("Mật khẩu và xác nhận mật khẩu không khớp!");
+            }
+            // Kiểm tra trùng lặp email và username trước khi lưu vào cơ sở dữ liệu
+            if (accountRepository.existsByEmail(registerRequest.getEmail())) {
+                throw new DuplicateEntity("Email này đã được sử dụng!");
+            }
 
+            if (accountRepository.existsByUserName(registerRequest.getUsername())) {
+                throw new DuplicateEntity("Username này đã tồn tại!");
+            }
 
-        Account account = modelMapper.map(registerRequest, Account.class);
+            Account account = modelMapper.map(registerRequest, Account.class);
 
-        try{
             //auto set role student
             account.setIsActive(true);
             account.setRole(AccountRole.STUDENT.name());
@@ -71,12 +82,24 @@ public class AccountServiceImpl implements AccountService {
             // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
             account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
             account.setEmail(registerRequest.getEmail());
-            account.setFullName(registerRequest.getFullName());
+            account.setUserName(registerRequest.getUsername());
 
-            accountRepository.save(account);
+            Account newAccount = accountRepository.save(account);
+
+            UserInformation userInformation = new UserInformation();
+            userInformation.setFullName(registerRequest.getFullName());
+            userInformation.setAccount(newAccount);
+            userInformation.setGender(registerRequest.getGender());
+            userInformation.setDob(registerRequest.getDob());
+
+            userInformationRepository.save(userInformation);
             return modelMapper.map(account, AccountResponse.class);
-        }catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("Đã xảy ra lỗi trong quá trình đăng ký, vui lòng thử lại sau.");
+        } catch (DataIntegrityViolationException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Đã xảy ra lỗi trong quá trình đăng ký: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Đã xảy ra lỗi không xác định: " + e.getMessage());
         }
     }
 
@@ -85,7 +108,7 @@ public class AccountServiceImpl implements AccountService {
             Authentication authentication =
                     authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(
-                                    loginRequest.getEmail(),
+                                    loginRequest.getUsername(),
                                     loginRequest.getPassword()));
 
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
