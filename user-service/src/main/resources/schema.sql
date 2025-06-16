@@ -29,9 +29,9 @@ CREATE TYPE transaction_status AS ENUM (
 -- Tạo bảng account
 CREATE TABLE account (
   id          SERIAL           PRIMARY KEY,
+  user_name   VARCHAR(255)      NOT NULL UNIQUE,
   email       VARCHAR(255)     NOT NULL UNIQUE,
   password    VARCHAR(255)     NOT NULL,
-  full_name   VARCHAR(50)      NOT NULL,
   is_active   BOOLEAN          NOT NULL DEFAULT TRUE,
   role        VARCHAR(50)     NOT NULL,
   create_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
@@ -41,6 +41,7 @@ CREATE TABLE account (
 CREATE TABLE user_information (
   user_id     SERIAL           PRIMARY KEY,
   account_id  INTEGER          NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  full_name   VARCHAR(50)      NOT NULL,
   gender      BOOLEAN          NOT NULL,
   dob         DATE             NOT NULL,
   phone       VARCHAR(20),
@@ -62,6 +63,7 @@ CREATE TABLE score (
   score_year_10 NUMERIC(4,2),
   score_year_11 NUMERIC(4,2),
   score_year_12 NUMERIC(4,2),
+  gpa           NUMERIC(4,2),
   CONSTRAINT uq_score_account_subject UNIQUE (account_id, subject_id)
 );
 

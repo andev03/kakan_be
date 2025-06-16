@@ -22,6 +22,7 @@ public class UserInformationServiceImpl implements UserInformationService {
     @Transactional
     public UserInformationDto updateUserInformation(UpdateUserInformationRequest request) {
         UserInformation userInformation = userInformationRepository.findByUserId(request.getUserId());
+        userInformation.setFullName(request.getFullName());
         userInformation.setDob(request.getDob());
         userInformation.setGender(request.getGender());
         userInformation.setPhone(request.getPhone());

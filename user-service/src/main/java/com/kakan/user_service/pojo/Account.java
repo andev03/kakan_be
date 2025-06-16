@@ -24,6 +24,11 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank(message = "Tên đăng nhập không được để trống")
+    @Size(min = 6, message = "Tên đăng nhập phải có từ 6 ký tự trở lên!!!")
+    @Column(name = "user_name" ,nullable = false, length = 50, unique = true)
+    private String userName;
+
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
     @Column(nullable = false, unique = true, length = 255)
@@ -33,9 +38,6 @@ public class Account {
     @Size(min = 6, message = "Mật khẩu phải có ít nhất 6 ký tự")
     @Column(nullable = false, length = 255)
     private String password;
-
-    @Column(name = "full_name", nullable = false, length = 50)
-    private String fullName;
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;

@@ -12,6 +12,7 @@ import com.kakan.user_service.service.AccountService;
 import com.kakan.user_service.service.impl.AuthenticationServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.NotFoundException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -63,7 +64,7 @@ public class AccountController {
     }
 
     @PostMapping("/register")
-    public ResponseDto<String> register(@RequestBody RegisterRequest account, BindingResult bindingResult) {
+    public ResponseDto<String> register(@Valid @RequestBody RegisterRequest account, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errors = new StringBuilder();
             for (FieldError error : bindingResult.getFieldErrors()) {
