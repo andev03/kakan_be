@@ -14,7 +14,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
-                .info(new Info().title("Claim Request API").version("1.0").description("API for Claim Request System"))
+                .info(new Info().title("Kakan API").version("1.0").description("API for Kakan"))
                 .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEMES))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes(SECURITY_SCHEMES, new SecurityScheme()

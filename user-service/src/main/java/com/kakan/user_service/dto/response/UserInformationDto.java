@@ -19,4 +19,13 @@ public class UserInformationDto {
     private String address;
 
     private String avatarUrl;
+
+    public UserInformationDto(Integer userId, Boolean gender, LocalDate dob, String phone, String address, String avatarUrl) {
+        this.userId = userId;
+        this.gender = gender;
+        this.dob = dob;
+        this.phone = phone;
+        this.address = address;
+        this.avatarUrl = avatarUrl;
+    }
 }

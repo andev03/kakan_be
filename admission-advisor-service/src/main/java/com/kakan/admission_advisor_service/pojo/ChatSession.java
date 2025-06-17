@@ -1,9 +1,7 @@
 package com.kakan.admission_advisor_service.pojo;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
@@ -15,20 +13,28 @@ import java.util.UUID;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatSession {
     @Id
     @GeneratedValue
-    private UUID id;
+    UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @Column(name = "title", nullable = false)
+    String title;
 
+    @Column(name = "account_id", nullable = false)
+    Integer accountId;
+
+    @Builder.Default
     @Column(name = "started_at")
-    private LocalDateTime startedAt = LocalDateTime.now();
+    LocalDateTime startedAt = LocalDateTime.now();
 
+    @Builder.Default
     @Column(name = "status")
-    private String status = "active";
+    String status = "active";
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChatMessage> messages;
+    List<ChatMessage> messages;
 }

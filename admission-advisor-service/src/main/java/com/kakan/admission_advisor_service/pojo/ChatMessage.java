@@ -1,9 +1,7 @@
 package com.kakan.admission_advisor_service.pojo;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
@@ -14,6 +12,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatMessage {
 
     @Id
@@ -28,11 +29,12 @@ public class ChatMessage {
     String senderType;
 
     @Column(name = "sender_id")
-    UUID senderId;
+    Integer senderId;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     String content;
 
+    @Builder.Default
     @Column(name = "sent_at")
     LocalDateTime sentAt = LocalDateTime.now();
 
