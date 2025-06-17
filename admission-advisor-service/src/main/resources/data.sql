@@ -1,18 +1,23 @@
-INSERT INTO chat_session (id, user_id) VALUES (
-    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-    '11111111-1111-1111-1111-111111111111'
-);
+INSERT INTO chat_session (id, account_id, title) VALUES
+    (
+        'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        1,
+        'User 1111 Chat with Bot'
+    ),
+    (
+        'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        1,
+        'User 2222 Chat with Bot'
+    );
 
--- Insert tin nhắn người dùng gửi bot
 INSERT INTO chat_message (session_id, sender_type, sender_id, content)
 VALUES (
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'user',
-    '11111111-1111-1111-1111-111111111111',
+    1,
     'Hello, how are you?'
 );
 
--- Insert tin nhắn bot trả lời
 INSERT INTO chat_message (session_id, sender_type, content)
 VALUES (
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
