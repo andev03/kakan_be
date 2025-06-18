@@ -1,18 +1,26 @@
 package com.kakan.forum_service.controller;
 
+<<<<<<< HEAD
 import com.kakan.forum_service.dto.request.CreatePostRequestDto;
 import com.kakan.forum_service.dto.response.ResponseDto;
 import com.kakan.forum_service.service.PostService;
 import jakarta.validation.Valid;
+=======
+>>>>>>> 92ffb13ae6314a5e742673ca6c4e1694c9bf0190
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+<<<<<<< HEAD
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+=======
+import org.springframework.web.bind.annotation.RestController;
+
+>>>>>>> 92ffb13ae6314a5e742673ca6c4e1694c9bf0190
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
@@ -20,6 +28,7 @@ import java.util.UUID;
 @RequestMapping("/api")
 public class PostController {
 
+<<<<<<< HEAD
     final PostService postService;
 
     @GetMapping("/posts")
@@ -84,4 +93,6 @@ public class PostController {
                 .data(postService.deletePostByPostId(postId))
                 .build();
     }
+=======
+>>>>>>> 92ffb13ae6314a5e742673ca6c4e1694c9bf0190
 }
