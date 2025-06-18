@@ -1,9 +1,7 @@
 package com.kakan.forum_service.pojo;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.UUID;
@@ -14,6 +12,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Comment {
 
     @Id
@@ -24,13 +25,13 @@ public class Comment {
     @JoinColumn(name = "post_id", nullable = false)
     Post post;
 
-    @Column(name = "user_id", nullable = false)
-    UUID userId;
+    @Column(name = "account_id", nullable = false)
+    Integer accountId;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     String content;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false)
-    LocalDateTime createdAt;
-
+    LocalDateTime createdAt = LocalDateTime.now();
 }
