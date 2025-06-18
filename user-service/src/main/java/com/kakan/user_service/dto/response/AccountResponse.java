@@ -6,7 +6,7 @@ import lombok.Data;
 public class AccountResponse {
     int id;
     String email;
-    String fullName;
+    String userName;
     String role;
     String token;
     boolean isActive;

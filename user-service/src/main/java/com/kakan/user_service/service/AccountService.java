@@ -11,9 +11,8 @@ public interface AccountService {
 
     List<Account> getAllAccounts();
     Account getAccountById(int id);
-    AccountResponse login(LoginRequest loginRequest);
-    AccountResponse register (RegisterRequest registerRequest);
-    void logout(String token) ;
+   AccountResponse login(LoginRequest loginRequest);
+
 
 
 

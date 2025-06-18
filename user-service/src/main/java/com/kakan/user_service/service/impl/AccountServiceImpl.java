@@ -23,31 +23,32 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AccountServiceImpl implements AccountService {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
 
-    @Autowired
-    ModelMapper modelMapper;
     @Autowired
     AccountRepository accountRepository;
 
     @Autowired
-    UserInformationRepository userInformationRepository;
+    ModelMapper modelMapper;
 
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
     @Autowired
     private TokenService tokenService;
 
+    final AuthenticationManager authenticationManager;
+
+    public AccountServiceImpl(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
 
     public List<Account> getAllAccounts(){
         List<Account> accounts = accountRepository.findAll();
@@ -56,51 +57,6 @@ public class AccountServiceImpl implements AccountService {
 
     public Account getAccountById(int id) {
         return accountRepository.findAccountById(id);
-    }
-
-    public AccountResponse register (RegisterRequest registerRequest) {
-        try {
-            // Kiểm tra confirmPassword trước khi tiếp tục
-            if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
-                throw new IllegalArgumentException("Mật khẩu và xác nhận mật khẩu không khớp!");
-            }
-            // Kiểm tra trùng lặp email và username trước khi lưu vào cơ sở dữ liệu
-            if (accountRepository.existsByEmail(registerRequest.getEmail())) {
-                throw new DuplicateEntity("Email này đã được sử dụng!");
-            }
-
-            if (accountRepository.existsByUserName(registerRequest.getUsername())) {
-                throw new DuplicateEntity("Username này đã tồn tại!");
-            }
-
-            Account account = modelMapper.map(registerRequest, Account.class);
-
-            //auto set role student
-            account.setIsActive(true);
-            account.setRole(AccountRole.STUDENT.name());
-
-            // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
-            account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-            account.setEmail(registerRequest.getEmail());
-            account.setUserName(registerRequest.getUsername());
-
-            Account newAccount = accountRepository.save(account);
-
-            UserInformation userInformation = new UserInformation();
-            userInformation.setFullName(registerRequest.getFullName());
-            userInformation.setAccount(newAccount);
-            userInformation.setGender(registerRequest.getGender());
-            userInformation.setDob(registerRequest.getDob());
-
-            userInformationRepository.save(userInformation);
-            return modelMapper.map(account, AccountResponse.class);
-        } catch (DataIntegrityViolationException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Đã xảy ra lỗi trong quá trình đăng ký: " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Đã xảy ra lỗi không xác định: " + e.getMessage());
-        }
     }
 
     public AccountResponse login(LoginRequest loginRequest) {
@@ -113,7 +69,7 @@ public class AccountServiceImpl implements AccountService {
 
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             Account account = userPrincipal.getAccount();
-            
+
             if (!account.getIsActive()) {
                 throw new NotFoundException("Tài khoản đã bị vô hiệu hóa!");
             }
@@ -135,9 +91,5 @@ public class AccountServiceImpl implements AccountService {
             e.printStackTrace();
             throw new RuntimeException("Đã xảy ra lỗi trong quá trình đăng nhập, vui lòng thử lại sau.");
         }
-    }
-
-    public void logout(String token) {
-        tokenService.invalidateToken(token);
     }
 }
