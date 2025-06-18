@@ -24,10 +24,10 @@ public class UserInformation {
     @Column(name = "full_name", length = 50)
     private String fullName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Boolean gender;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDate dob;
 
     @Column(length = 20)
