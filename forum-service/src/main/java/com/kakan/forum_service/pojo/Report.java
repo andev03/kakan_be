@@ -4,18 +4,18 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.UUID;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "comment")
+@Table(name = "report")
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class Report {
 
     @Id
     @GeneratedValue
@@ -25,13 +25,13 @@ public class Comment {
     @JoinColumn(name = "post_id", nullable = false)
     Post post;
 
-    @Column(name = "account_id", nullable = false)
-    Integer accountId;
+    @Column(name = "reporter_id", nullable = false)
+    Integer reporterId;
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    String content;
+    String reason;
 
-    @Builder.Default
     @Column(name = "created_at", nullable = false)
+    @Builder.Default
     LocalDateTime createdAt = LocalDateTime.now();
 }
