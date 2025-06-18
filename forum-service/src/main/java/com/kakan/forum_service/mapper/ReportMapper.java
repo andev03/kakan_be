@@ -1,16 +1,16 @@
 package com.kakan.forum_service.mapper;
 
-import com.kakan.forum_service.dto.PostDto;
-import com.kakan.forum_service.pojo.Post;
+import com.kakan.forum_service.dto.ReportDto;
+import com.kakan.forum_service.pojo.Report;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface PostMapper {
+public interface ReportMapper {
 
-    PostDto toDto(Post post);
+    ReportDto toDto(Report report);
 
-    List<PostDto> toDtoList(List<Post> posts);
+    List<ReportDto> toDtoList(List<Report> reports);
 }

@@ -48,7 +48,7 @@ public class ChatController {
     }
 
     @PostMapping("/chat-messages")
-    public ResponseDto<Object> chatMessages(@Valid ChatMessageRequestDto chatMessageRequestDto) {
+    public ResponseDto<Object> chatMessages(@Valid @RequestBody ChatMessageRequestDto chatMessageRequestDto) {
 
         return ResponseDto.builder()
                 .status(HttpStatus.OK.value())
