@@ -8,8 +8,11 @@ DROP TABLE IF EXISTS "transaction" CASCADE;
 DROP TABLE IF EXISTS "order" CASCADE;
 DROP TABLE IF EXISTS score CASCADE;
 DROP TABLE IF EXISTS subject CASCADE;
+DROP TABLE IF EXISTS block CASCADE;
+DROP TABLE IF EXISTS block_subject CASCADE;
 DROP TABLE IF EXISTS user_information CASCADE;
 DROP TABLE IF EXISTS account CASCADE;
+
 
 
 
@@ -55,6 +58,18 @@ CREATE TABLE subject (
   subject_id    SERIAL         PRIMARY KEY,
   subject_name  VARCHAR(100)   NOT NULL UNIQUE
 );
+CREATE TABLE block (
+    code VARCHAR(4) PRIMARY KEY
+);
+
+CREATE TABLE block_subject (
+    block_code VARCHAR(4),
+    subject_id INT,
+    PRIMARY KEY(block_code, subject_id),
+    FOREIGN KEY (block_code) REFERENCES block(code),
+    FOREIGN KEY (subject_id) REFERENCES subject(subject_id)
+);
+
 
 -- Tạo bảng score
 CREATE TABLE score (
