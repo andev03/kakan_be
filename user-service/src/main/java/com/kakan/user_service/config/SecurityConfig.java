@@ -43,7 +43,7 @@ public class SecurityConfig {
 
     @Autowired
     AuthenticationServiceImpl authenticationService;
-    
+
     @Autowired
     private JwtFilter jwtFilter;
 
@@ -71,7 +71,6 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
 
 
     @Bean

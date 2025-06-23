@@ -46,6 +46,7 @@ CREATE TABLE user_information (
   dob         DATE             NOT NULL,
   phone       VARCHAR(20),
   address     TEXT,
+  gpa           NUMERIC(4,2),
   avatar_url  TEXT
 );
 
@@ -63,7 +64,6 @@ CREATE TABLE score (
   score_year_10 NUMERIC(4,2),
   score_year_11 NUMERIC(4,2),
   score_year_12 NUMERIC(4,2),
-  gpa           NUMERIC(4,2),
   CONSTRAINT uq_score_account_subject UNIQUE (account_id, subject_id)
 );
 
