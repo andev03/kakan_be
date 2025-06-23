@@ -2,6 +2,7 @@ package com.kakan.user_service.controller;
 
 import com.kakan.user_service.dto.SubjectScoreDto;
 import com.kakan.user_service.dto.request.ScoreRequest;
+import com.kakan.user_service.dto.response.BlockScoreResponeDto;
 import com.kakan.user_service.dto.response.GpaResponseDto;
 import com.kakan.user_service.dto.response.ResponseDto;
 import com.kakan.user_service.dto.response.ViewScoreDetail;
@@ -31,17 +32,16 @@ public class CalculateController {
 
     }
 
-    @PutMapping(value = "/update/gpa")
-    public ResponseDto<GpaResponseDto> updateScore(@RequestBody @Valid ScoreRequest dto) {
-        double gpa = scoreService.updateGPA(dto.getSubjectScores());
-        GpaResponseDto responseDto = new GpaResponseDto(gpa);
-        return new ResponseDto<>(200, "GPA calculated successfully", responseDto);
-
-    }
 
     @GetMapping(value = "/view/gpa")
     public ResponseDto<List<ViewScoreDetail>> viewScoreDetail() {
         List<ViewScoreDetail> viewScoreDetail = scoreService.getScoreDetails();
         return new ResponseDto<>(200, "Score details fetched successfully", viewScoreDetail);
+    }
+
+    @PostMapping(value = "/calculate/block-score")
+    public ResponseDto<List<BlockScoreResponeDto>> calculateBlockScore() {
+        List<BlockScoreResponeDto> blockScores = scoreService.calculateBlockScore();
+        return new ResponseDto<>(200, "Block scores calculated successfully", blockScores);
     }
 }
