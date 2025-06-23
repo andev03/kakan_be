@@ -23,17 +23,25 @@ public class CalculateController {
         this.scoreService = scoreService;
     }
 
-    @PostMapping(value = "/calculate/gpa/{accountId}")
-    public ResponseDto<GpaResponseDto> submitScore(@PathVariable int accountId, @RequestBody @Valid ScoreRequest dto) {
-        double gpa = scoreService.calculateGpa(accountId, dto.getSubjectScores());
+    @PostMapping(value = "/calculate/gpa")
+    public ResponseDto<GpaResponseDto> submitScore(@RequestBody @Valid ScoreRequest dto) {
+        double gpa = scoreService.calculateGpa(dto.getSubjectScores());
         GpaResponseDto responseDto = new GpaResponseDto(gpa);
         return new ResponseDto<>(200, "GPA calculated successfully", responseDto);
 
     }
 
-    @GetMapping(value = "/view/gpa/{accountId}")
-    public ResponseDto<List<ViewScoreDetail>> viewScoreDetail(@PathVariable int accountId) {
-        List<ViewScoreDetail> viewScoreDetail = scoreService.getScoreDetails(accountId);
+    @PutMapping(value = "/update/gpa")
+    public ResponseDto<GpaResponseDto> updateScore(@RequestBody @Valid ScoreRequest dto) {
+        double gpa = scoreService.updateGPA(dto.getSubjectScores());
+        GpaResponseDto responseDto = new GpaResponseDto(gpa);
+        return new ResponseDto<>(200, "GPA calculated successfully", responseDto);
+
+    }
+
+    @GetMapping(value = "/view/gpa")
+    public ResponseDto<List<ViewScoreDetail>> viewScoreDetail() {
+        List<ViewScoreDetail> viewScoreDetail = scoreService.getScoreDetails();
         return new ResponseDto<>(200, "Score details fetched successfully", viewScoreDetail);
     }
 }

@@ -40,9 +40,9 @@ public class UserInformationController {
 
     }
 
-    @PostMapping("/image/{id}")
-    public ResponseEntity uploadImage(@PathVariable int id, @RequestPart MultipartFile file) {
-        userInformationService.uploadImage(id, file);
+    @PostMapping("/uploadImage")
+    public ResponseEntity uploadImage(@RequestPart MultipartFile file) {
+        userInformationService.uploadImage(file);
         return ResponseEntity.ok("Uploaded image successfully");
     }
 
