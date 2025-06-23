@@ -6,7 +6,8 @@ import com.kakan.user_service.dto.response.ViewScoreDetail;
 import java.util.List;
 
 public interface ScoreService {
-    public double calculateGpa(int accountId, List<SubjectScoreDto> dtos);
-    public List<ViewScoreDetail> getScoreDetails(int accountId) ;
+    public double calculateGpa( List<SubjectScoreDto> dtos);
+    public List<ViewScoreDetail> getScoreDetails() ;
+    public double updateGPA(List<SubjectScoreDto> dtos);
 
 }
