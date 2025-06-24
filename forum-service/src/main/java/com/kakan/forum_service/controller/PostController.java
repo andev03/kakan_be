@@ -64,7 +64,7 @@ public class PostController {
                 .build();
     }
 
-    @GetMapping("/post/{reportId}")
+    @GetMapping("/post/report/{reportId}")
     public ResponseDto<Object> viewPostByReportId(@PathVariable UUID reportId) {
         return ResponseDto.builder()
                 .status(HttpStatus.OK.value())
@@ -88,6 +88,15 @@ public class PostController {
                 .status(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
                 .data(postService.deletePostByPostId(postId))
+                .build();
+    }
+
+    @GetMapping("/post/{postId}")
+    public ResponseDto<Object> viewPostByPostId(@PathVariable UUID postId) {
+        return ResponseDto.builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .data(postService.viewPostByPostId(postId))
                 .build();
     }
 }

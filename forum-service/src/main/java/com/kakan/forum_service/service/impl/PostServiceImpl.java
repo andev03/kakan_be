@@ -97,4 +97,12 @@ public class PostServiceImpl implements PostService {
 
         return postMapper.toDto(post);
     }
+
+    @Override
+    public PostDto viewPostByPostId(UUID postId) {
+
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+
+        return postMapper.toDto(post);
+    }
 }
