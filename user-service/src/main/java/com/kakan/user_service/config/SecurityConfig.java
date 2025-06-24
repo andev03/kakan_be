@@ -96,12 +96,12 @@ public class SecurityConfig {
 //                return;
 //            }
 
-            // Mã hóa các thông tin để gửi qua URL
+//             //Mã hóa các thông tin để gửi qua URL
 //            String encodedToken = URLEncoder.encode(accountResponse.getToken(), "UTF-8");
 //            String encodedUsername = URLEncoder.encode(accountResponse.getUserName(), "UTF-8");
 //            String role = URLEncoder.encode(accountResponse.getRole(), "UTF-8");
 //
-//            String redirectUrl = "";
+//            String redirectUrl = "http://localhost:5173/forum/";
 //            response.sendRedirect(redirectUrl);
 
             Map<String, String> tokenMap = new HashMap<>();
