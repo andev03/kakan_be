@@ -13,10 +13,10 @@ import java.util.UUID;
 @Table(name = "post")
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Post {
 
     @Id
@@ -26,8 +26,15 @@ public class Post {
     @Column(name = "account_id", nullable = false)
     Integer accountId;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(name = "title", nullable = false, length = 255)
+    String title;
+
+    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     String content;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_id")
+    Topic topic;
 
     @Column(name = "like_count", nullable = false)
     @Builder.Default
@@ -37,14 +44,24 @@ public class Post {
     @Builder.Default
     int commentCount = 0;
 
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false, length = 20)
     @Builder.Default
-    String status = PostStatus.ACTIVE.toString();
+    String status = PostStatus.ACTIVE.name();
 
     @Column(name = "created_at", nullable = false)
     @Builder.Default
     LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "updated_at", nullable = false)
+    @Builder.Default
+    LocalDateTime updatedAt = LocalDateTime.now();
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Comment> comments;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<PostLike> likes;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Report> reports;
 }

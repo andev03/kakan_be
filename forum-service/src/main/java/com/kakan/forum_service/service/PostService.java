@@ -21,4 +21,6 @@ public interface PostService {
     PostDto blockPostByPostId(UUID postId);
 
     PostDto deletePostByPostId(UUID postId);
+
+    PostDto viewPostByPostId(UUID postId);
 }
