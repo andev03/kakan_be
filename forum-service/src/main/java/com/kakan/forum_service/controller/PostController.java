@@ -1,5 +1,6 @@
 package com.kakan.forum_service.controller;
 
+
 import com.kakan.forum_service.dto.request.CreatePostRequestDto;
 import com.kakan.forum_service.dto.response.ResponseDto;
 import com.kakan.forum_service.service.PostService;
@@ -9,9 +10,13 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+
+
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController

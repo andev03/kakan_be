@@ -36,7 +36,4 @@ public class Score {
     @Column(name = "score_year_12")
     private Double scoreYear12;
 
-    @Column(name = "gpa")
-    private Double gpa;
-
 }

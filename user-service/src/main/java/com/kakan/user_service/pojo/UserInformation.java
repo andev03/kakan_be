@@ -39,4 +39,6 @@ public class UserInformation {
     @Column(name = "avatar_url", columnDefinition = "TEXT")
     private String avatarUrl;
 
+    @Column(name = "gpa")
+    private Double gpa;
 }

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ScoreRepository extends JpaRepository<Score, Integer> {
     List<Score> findScoreByAccount_Id(int accountId);
+    boolean existsByAccount_Id(int accountId);
 }
