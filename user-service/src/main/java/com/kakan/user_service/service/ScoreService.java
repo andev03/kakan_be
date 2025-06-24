@@ -9,7 +9,7 @@ import java.util.List;
 public interface ScoreService {
     public double calculateGpa( List<SubjectScoreDto> dtos);
     public List<ViewScoreDetail> getScoreDetails() ;
-    public List<BlockScoreResponeDto> calculateBlockScore() ;
+    public List<BlockScoreResponeDto> calculateBlockScore(List<SubjectScoreDto> dtos) ;
 
 
 }

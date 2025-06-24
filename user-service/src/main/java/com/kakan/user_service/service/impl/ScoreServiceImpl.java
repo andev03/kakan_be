@@ -111,34 +111,71 @@ public class ScoreServiceImpl implements ScoreService {
         return viewScoreDetail;
     }
 
-    public List<BlockScoreResponeDto> calculateBlockScore() {
+    public List<BlockScoreResponeDto> calculateBlockScore(List<SubjectScoreDto> dtos) {
         Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Block> blocks = blockRepository.findAll();
-        List<Score> scores = scoreRepository.findScoreByAccount_Id(account.getId());
-        List<BlockScoreResponeDto> result = new ArrayList<>();
 
-        for (Block block : blocks) {
-            double totalScore = 0.0;
-            int subjectCount = 0;
+        try{
+            boolean isCalculate = scoreRepository.existsByAccount_Id(account.getId());
+            List<Score> entities = new ArrayList<>();
+            for (SubjectScoreDto dto : dtos) {
 
-            for (Subject subject : block.getSubjects()) {
-                Score found = null;
-                for (Score score : scores) {
-                    if (score.getSubject().getSubjectId().equals(subject.getSubjectId())) {
-                        found = score;
-                        break;
+                String subjectKey = dto.getSubject(); // e.g., "toan"
+                String subjectName = SUBJECT_NAME_MAP.get(subjectKey);
+
+                if (subjectName == null) {
+                    throw new RuntimeException("Invalid subject key: " + subjectKey);
+                }
+
+                Subject subject = subjectRepository.findBySubjectName(subjectName);
+                if (subject == null) {
+                    throw new RuntimeException("Subject not found for name: " + subjectName);
+                }
+                for (Score existingScore : scoreRepository.findScoreByAccount_Id(account.getId())) {
+                    if (existingScore.getSubject().getSubjectName().equals(subjectName)) {
+                        existingScore.setScoreYear10(dto.getScoreYear10());
+                        existingScore.setScoreYear11(dto.getScoreYear11());
+                        existingScore.setScoreYear12(dto.getScoreYear12());
+                        entities.add(existingScore);
                     }
                 }
-                if (found != null) {
-                    double averageScore = (found.getScoreYear10() + found.getScoreYear11() + found.getScoreYear12()) / 3.0;
-                    totalScore = Math.round((totalScore + averageScore)* 100.0) / 100.0; // Round to 2 decimal places
-
-                    subjectCount++;
+                if (!isCalculate) {// If no existing score found, create a new one
+                    Score score = new Score();
+                    score.setAccount(account);
+                    score.setSubject(subject);
+                    score.setScoreYear10(dto.getScoreYear10());
+                    score.setScoreYear11(dto.getScoreYear11());
+                    score.setScoreYear12(dto.getScoreYear12());
+                    entities.add(score);
                 }
             }
-            result.add(new BlockScoreResponeDto(block.getCode(), totalScore));
+            scoreRepository.saveAll(entities);
+            List<Block> blocks = blockRepository.findAll();
+            List<Score> scores = scoreRepository.findScoreByAccount_Id(account.getId());
+            List<BlockScoreResponeDto> result = new ArrayList<>();
+
+            for (Block block : blocks) {
+                double totalScore = 0.0;
+
+                for (Subject subject : block.getSubjects()) {
+                    Score found = null;
+                    for (Score score : scores) {
+                        if (score.getSubject().getSubjectId().equals(subject.getSubjectId())) {
+                            found = score;
+                            break;
+                        }
+                    }
+                    if (found != null) {
+                        double averageScore = (found.getScoreYear10() + found.getScoreYear11() + found.getScoreYear12()) / 3.0;
+                        totalScore = Math.round((totalScore + averageScore)* 100.0) / 100.0; // Round to 2 decimal places
+                    }
+                }
+                result.add(new BlockScoreResponeDto(block.getCode(), totalScore));
+            }
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return result;
+
     }
 
 
