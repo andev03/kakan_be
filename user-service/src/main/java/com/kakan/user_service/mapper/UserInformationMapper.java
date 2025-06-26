@@ -1,5 +1,6 @@
 package com.kakan.user_service.mapper;
 
+import com.kakan.user_service.dto.UserInformationGrpcDto;
 import com.kakan.user_service.dto.response.UserInformationDto;
 import com.kakan.user_service.pojo.UserInformation;
 import org.mapstruct.Mapper;
@@ -9,6 +10,10 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserInformationMapper {
+
+    UserInformationGrpcDto toGrpcDto(UserInformation userInformation);
+
+    List<UserInformationGrpcDto> toGrpcDtoList(List<UserInformation> userInformationList);
 
     List<UserInformationDto> toDtoList(List<UserInformation> userInformations);
 }

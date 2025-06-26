@@ -1,15 +1,20 @@
 package com.kakan.forum_service.service.impl;
 
+import com.kakan.account.grpc.UserIdListRequest;
+import com.kakan.account.grpc.UserListResponse;
+import com.kakan.account.grpc.UserResponse;
+import com.kakan.account.grpc.UserServiceGrpc;
 import com.kakan.forum_service.dto.PostDto;
 import com.kakan.forum_service.dto.request.CreatePostRequestDto;
 import com.kakan.forum_service.enums.PostStatus;
-import com.kakan.forum_service.exception.PostLikeNotFoundException;
 import com.kakan.forum_service.exception.PostNotFoundException;
 import com.kakan.forum_service.exception.ReportNotFoundException;
 import com.kakan.forum_service.mapper.PostMapper;
 import com.kakan.forum_service.pojo.*;
 import com.kakan.forum_service.repository.*;
 import com.kakan.forum_service.service.PostService;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -38,8 +43,13 @@ public class PostServiceImpl implements PostService {
     final PostLikeRepository postLikeRepository;
 
     @Override
-    public List<PostDto> viewAllPost() {
+    public List<PostDto> viewAllPostAdmin() {
         return postMapper.toDtoList(postRepository.findAll());
+    }
+
+    @Override
+    public List<PostDto> viewAllPost() {
+        return List.of();
     }
 
     @Override
@@ -162,5 +172,35 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
         return postMapper.toDto(post);
+    }
+
+    @Override
+    public List<String> viewUserNameLiked(UUID postId) {
+        List<PostLike> postLikes = postLikeRepository.findByPost_Id(postId);
+
+        List<Integer> accountIds = new ArrayList<>();
+
+        for (PostLike postLike : postLikes) {
+            accountIds.add(postLike.getAccountId());
+        }
+        return getAccountNameFromAccountService(accountIds);
+    }
+
+    private List<String> getAccountNameFromAccountService(List<Integer> accountIds) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090)
+                .usePlaintext()
+                .build();
+
+        try {
+            UserServiceGrpc.UserServiceBlockingStub stub = UserServiceGrpc.newBlockingStub(channel);
+            UserIdListRequest request = UserIdListRequest.newBuilder().addAllUserIds(accountIds).build();
+            UserListResponse response = stub.getUsersByIds(request);
+
+            return response.getUsersList().stream()
+                    .map(UserResponse::getFullName)
+                    .toList();
+        } finally {
+            channel.shutdown();
+        }
     }
 }

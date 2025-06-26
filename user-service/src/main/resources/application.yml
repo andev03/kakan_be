@@ -68,3 +68,9 @@ eureka:
     registerWithEureka: true
     serviceUrl:
       defaultZone: http://localhost:8070/eureka/
+
+grpc:
+  server:
+    port: 9090
+    security:
+      enabled: false

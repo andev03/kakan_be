@@ -8,6 +8,8 @@ import java.util.UUID;
 
 public interface PostService {
 
+    List<PostDto> viewAllPostAdmin();
+
     List<PostDto> viewAllPost();
 
     List<PostDto> viewPostByAccountId(Integer accountId);
@@ -23,4 +25,6 @@ public interface PostService {
     PostDto deletePostByPostId(UUID postId);
 
     PostDto viewPostByPostId(UUID postId);
+
+    List<String> viewUserNameLiked(UUID postId);
 }
