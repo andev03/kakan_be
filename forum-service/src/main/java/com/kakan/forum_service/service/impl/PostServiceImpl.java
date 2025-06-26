@@ -7,9 +7,13 @@ import com.kakan.forum_service.exception.PostNotFoundException;
 import com.kakan.forum_service.exception.ReportNotFoundException;
 import com.kakan.forum_service.mapper.PostMapper;
 import com.kakan.forum_service.pojo.Post;
+import com.kakan.forum_service.pojo.PostTopic;
 import com.kakan.forum_service.pojo.Report;
+import com.kakan.forum_service.pojo.Topic;
 import com.kakan.forum_service.repository.PostRepository;
+import com.kakan.forum_service.repository.PostTopicRepository;
 import com.kakan.forum_service.repository.ReportRepository;
+import com.kakan.forum_service.repository.TopicRepository;
 import com.kakan.forum_service.service.PostService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +21,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +35,10 @@ public class PostServiceImpl implements PostService {
     final PostMapper postMapper;
 
     final ReportRepository reportRepository;
+
+    final PostTopicRepository postTopicRepository;
+
+    final TopicRepository topicRepository;
 
     @Override
     public List<PostDto> viewAllPost() {
@@ -54,13 +63,45 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public PostDto createPost(CreatePostRequestDto createPostRequestDto) {
+
         Post post = postRepository.save(
                 Post.builder()
                         .accountId(createPostRequestDto.getAccountId())
+                        .title(createPostRequestDto.getTitle())
                         .content(createPostRequestDto.getContent())
                         .build()
         );
+
+        List<PostTopic> postTopic = savePostTopic(createPostRequestDto.getTopicId(), post);
+
+        post.setPostTopics(postTopic);
+
         return postMapper.toDto(post);
+    }
+
+    @Transactional
+    private List<PostTopic> savePostTopic(List<Integer> topicIds, Post post) {
+        List<Topic> topics = getAllTopicByListId(topicIds);
+
+        return postTopicRepository.saveAll(createPostTopicByTopic(topics, post));
+    }
+
+    private List<Topic> getAllTopicByListId(List<Integer> topicIds) {
+        return topicRepository.findAllById(topicIds);
+    }
+
+    private List<PostTopic> createPostTopicByTopic(List<Topic> topics, Post post) {
+        List<PostTopic> postTopics = new ArrayList<>();
+        for (Topic topic : topics) {
+            postTopics.add(
+                    PostTopic.builder()
+                            .topic(topic)
+                            .post(post)
+                            .build()
+            );
+        }
+
+        return postTopics;
     }
 
     @Override

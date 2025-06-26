@@ -32,9 +32,8 @@ public class Post {
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_id")
-    Topic topic;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PostTopic> postTopics;
 
     @Column(name = "like_count", nullable = false)
     @Builder.Default

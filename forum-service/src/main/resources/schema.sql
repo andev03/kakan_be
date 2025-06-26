@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS post_topic CASCADE;
 DROP TABLE IF EXISTS post_like CASCADE;
 DROP TABLE IF EXISTS report CASCADE;
 DROP TABLE IF EXISTS comment CASCADE;
@@ -15,13 +16,18 @@ CREATE TABLE post (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     account_id INTEGER NOT NULL,
     title VARCHAR(255) NOT NULL,
-    topic_id INT REFERENCES topic(id),
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now(),
     like_count INT DEFAULT 0,
     comment_count INT DEFAULT 0,
     status VARCHAR(20) DEFAULT 'ACTIVE'
+);
+
+CREATE TABLE post_topic (
+    post_id UUID NOT NULL REFERENCES post(id) ON DELETE CASCADE,
+    topic_id INT NOT NULL REFERENCES topic(id) ON DELETE CASCADE,
+    PRIMARY KEY (post_id, topic_id)
 );
 
 CREATE TABLE comment (

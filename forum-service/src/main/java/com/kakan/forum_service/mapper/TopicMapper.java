@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface TopicMapper {
-    List<TopicDto> toDtoList(List<Topic> comments);
+    List<TopicDto> toDtoList(List<Topic> topics);
 
-    TopicDto toDto(Topic comment);
+    TopicDto toDto(Topic topic);
 }
