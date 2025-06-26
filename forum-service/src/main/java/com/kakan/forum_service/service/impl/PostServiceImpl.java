@@ -3,13 +3,12 @@ package com.kakan.forum_service.service.impl;
 import com.kakan.forum_service.dto.PostDto;
 import com.kakan.forum_service.dto.request.CreatePostRequestDto;
 import com.kakan.forum_service.enums.PostStatus;
+import com.kakan.forum_service.exception.PostLikeNotFoundException;
 import com.kakan.forum_service.exception.PostNotFoundException;
 import com.kakan.forum_service.exception.ReportNotFoundException;
 import com.kakan.forum_service.mapper.PostMapper;
-import com.kakan.forum_service.pojo.Post;
-import com.kakan.forum_service.pojo.Report;
-import com.kakan.forum_service.repository.PostRepository;
-import com.kakan.forum_service.repository.ReportRepository;
+import com.kakan.forum_service.pojo.*;
+import com.kakan.forum_service.repository.*;
 import com.kakan.forum_service.service.PostService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +31,12 @@ public class PostServiceImpl implements PostService {
 
     final ReportRepository reportRepository;
 
+    final PostTopicRepository postTopicRepository;
+
+    final TopicRepository topicRepository;
+
+    final PostLikeRepository postLikeRepository;
+
     @Override
     public List<PostDto> viewAllPost() {
         return postMapper.toDtoList(postRepository.findAll());
@@ -43,24 +49,76 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public PostDto likePostByPostId(UUID postId) {
+    public PostDto likePostByPostId(UUID postId, Integer accountId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
-        post.setLikeCount(post.getLikeCount() + 1);
+        PostLikeId postLikeId = PostLikeId.builder()
+                .accountId(accountId)
+                .post(post)
+                .build();
+
+        PostLike postLike = PostLike.builder()
+                .accountId(postLikeId.getAccountId())
+                .post(postLikeId.getPost())
+                .build();
+
+        postLikeRepository.findById(postLikeId)
+                .ifPresentOrElse(postLikes -> {
+                    post.setLikeCount(post.getLikeCount() - 1);
+                    postLikeRepository.delete(postLike);
+                }, () -> {
+                    post.setLikeCount(post.getLikeCount() + 1);
+                    postLikeRepository.save(postLike);
+                });
+
         postRepository.save(post);
+
         return postMapper.toDto(post);
     }
+
 
     @Override
     @Transactional
     public PostDto createPost(CreatePostRequestDto createPostRequestDto) {
+
         Post post = postRepository.save(
                 Post.builder()
                         .accountId(createPostRequestDto.getAccountId())
+                        .title(createPostRequestDto.getTitle())
                         .content(createPostRequestDto.getContent())
                         .build()
         );
+
+        List<PostTopic> postTopic = savePostTopic(createPostRequestDto.getTopicId(), post);
+
+        post.setPostTopics(postTopic);
+
         return postMapper.toDto(post);
+    }
+
+    @Transactional
+    private List<PostTopic> savePostTopic(List<Integer> topicIds, Post post) {
+        List<Topic> topics = getAllTopicByListId(topicIds);
+
+        return postTopicRepository.saveAll(createPostTopicByTopic(topics, post));
+    }
+
+    private List<Topic> getAllTopicByListId(List<Integer> topicIds) {
+        return topicRepository.findAllById(topicIds);
+    }
+
+    private List<PostTopic> createPostTopicByTopic(List<Topic> topics, Post post) {
+        List<PostTopic> postTopics = new ArrayList<>();
+        for (Topic topic : topics) {
+            postTopics.add(
+                    PostTopic.builder()
+                            .topic(topic)
+                            .post(post)
+                            .build()
+            );
+        }
+
+        return postTopics;
     }
 
     @Override

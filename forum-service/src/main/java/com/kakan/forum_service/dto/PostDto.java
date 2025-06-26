@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -16,8 +17,7 @@ public class PostDto {
 
     String title;
 
-    @Builder.Default
-    String accountName = "Nguyen Van A";
+    List<String> accountNameLiked;
 
     String content;
 
@@ -29,5 +29,12 @@ public class PostDto {
 
     LocalDateTime createdAt;
 
-    String topicName;
+    List<String> topicName;
+
+    public List<String> getAccountName() {
+        if (accountNameLiked == null || accountNameLiked.isEmpty()) {
+            return List.of("Nguyen Van A", "Nguyen Van B", "Nguyen Van C");
+        }
+        return accountNameLiked;
+    }
 }

@@ -23,7 +23,7 @@ public class Topic {
     @Column(nullable = false, unique = true, length = 100)
     String name;
 
-    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY)
-    List<Post> posts;
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PostTopic> postTopics;
 }
 
