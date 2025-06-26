@@ -28,12 +28,12 @@ public class PostController {
 
     final PostService postService;
 
-    @GetMapping("/posts")
-    public ResponseDto<Object> viewAllPost() {
+    @GetMapping("/posts/admin")
+    public ResponseDto<Object> viewAllPostAdmin() {
         return ResponseDto.builder()
                 .status(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
-                .data(postService.viewAllPost())
+                .data(postService.viewAllPostAdmin())
                 .build();
     }
 
@@ -97,6 +97,15 @@ public class PostController {
                 .status(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
                 .data(postService.viewPostByPostId(postId))
+                .build();
+    }
+
+    @GetMapping("/post/{postId}/like")
+    public ResponseDto<Object> viewUserNameLiked(@PathVariable UUID postId) {
+        return ResponseDto.builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .data(postService.viewUserNameLiked(postId))
                 .build();
     }
 }

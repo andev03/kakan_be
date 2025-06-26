@@ -1,5 +1,6 @@
 package com.kakan.forum_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostDto {
 
     UUID id;
@@ -30,11 +32,4 @@ public class PostDto {
     LocalDateTime createdAt;
 
     List<String> topicName;
-
-    public List<String> getAccountName() {
-        if (accountNameLiked == null || accountNameLiked.isEmpty()) {
-            return List.of("Nguyen Van A", "Nguyen Van B", "Nguyen Van C");
-        }
-        return accountNameLiked;
-    }
 }
