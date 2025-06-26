@@ -17,7 +17,7 @@ public class PostDto {
 
     String title;
 
-    List<String> accountName;
+    List<String> accountNameLiked;
 
     String content;
 
@@ -32,9 +32,9 @@ public class PostDto {
     List<String> topicName;
 
     public List<String> getAccountName() {
-        if (accountName == null || accountName.isEmpty()) {
+        if (accountNameLiked == null || accountNameLiked.isEmpty()) {
             return List.of("Nguyen Van A", "Nguyen Van B", "Nguyen Van C");
         }
-        return accountName;
+        return accountNameLiked;
     }
 }

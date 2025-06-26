@@ -3,17 +3,12 @@ package com.kakan.forum_service.service.impl;
 import com.kakan.forum_service.dto.PostDto;
 import com.kakan.forum_service.dto.request.CreatePostRequestDto;
 import com.kakan.forum_service.enums.PostStatus;
+import com.kakan.forum_service.exception.PostLikeNotFoundException;
 import com.kakan.forum_service.exception.PostNotFoundException;
 import com.kakan.forum_service.exception.ReportNotFoundException;
 import com.kakan.forum_service.mapper.PostMapper;
-import com.kakan.forum_service.pojo.Post;
-import com.kakan.forum_service.pojo.PostTopic;
-import com.kakan.forum_service.pojo.Report;
-import com.kakan.forum_service.pojo.Topic;
-import com.kakan.forum_service.repository.PostRepository;
-import com.kakan.forum_service.repository.PostTopicRepository;
-import com.kakan.forum_service.repository.ReportRepository;
-import com.kakan.forum_service.repository.TopicRepository;
+import com.kakan.forum_service.pojo.*;
+import com.kakan.forum_service.repository.*;
 import com.kakan.forum_service.service.PostService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +35,8 @@ public class PostServiceImpl implements PostService {
 
     final TopicRepository topicRepository;
 
+    final PostLikeRepository postLikeRepository;
+
     @Override
     public List<PostDto> viewAllPost() {
         return postMapper.toDtoList(postRepository.findAll());
@@ -52,13 +49,33 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public PostDto likePostByPostId(UUID postId) {
+    public PostDto likePostByPostId(UUID postId, Integer accountId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
-        post.setLikeCount(post.getLikeCount() + 1);
+        PostLikeId postLikeId = PostLikeId.builder()
+                .accountId(accountId)
+                .post(post)
+                .build();
+
+        PostLike postLike = PostLike.builder()
+                .accountId(postLikeId.getAccountId())
+                .post(postLikeId.getPost())
+                .build();
+
+        postLikeRepository.findById(postLikeId)
+                .ifPresentOrElse(postLikes -> {
+                    post.setLikeCount(post.getLikeCount() - 1);
+                    postLikeRepository.delete(postLike);
+                }, () -> {
+                    post.setLikeCount(post.getLikeCount() + 1);
+                    postLikeRepository.save(postLike);
+                });
+
         postRepository.save(post);
+
         return postMapper.toDto(post);
     }
+
 
     @Override
     @Transactional

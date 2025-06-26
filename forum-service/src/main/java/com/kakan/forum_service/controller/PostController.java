@@ -46,12 +46,12 @@ public class PostController {
                 .build();
     }
 
-    @PutMapping("/post/{postId}/like")
-    public ResponseDto<Object> likePostByPostId(@PathVariable UUID postId) {
+    @PutMapping("/post/{postId}/{accountId}/like")
+    public ResponseDto<Object> likePostByPostId(@PathVariable UUID postId, @PathVariable Integer accountId) {
         return ResponseDto.builder()
                 .status(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
-                .data(postService.likePostByPostId(postId))
+                .data(postService.likePostByPostId(postId, accountId))
                 .build();
     }
 

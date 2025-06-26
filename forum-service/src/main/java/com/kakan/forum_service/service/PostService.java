@@ -12,7 +12,7 @@ public interface PostService {
 
     List<PostDto> viewPostByAccountId(Integer accountId);
 
-    PostDto likePostByPostId(UUID postId);
+    PostDto likePostByPostId(UUID postId, Integer accountId);
 
     PostDto createPost(CreatePostRequestDto createPostRequestDto);
 
