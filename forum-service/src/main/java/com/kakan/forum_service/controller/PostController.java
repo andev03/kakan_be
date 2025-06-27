@@ -37,6 +37,24 @@ public class PostController {
                 .build();
     }
 
+    @GetMapping("/posts/all/{accountId}")
+    public ResponseDto<Object> viewAllPostUser(@PathVariable Integer accountId) {
+        return ResponseDto.builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .data(postService.viewAllPostUser(accountId))
+                .build();
+    }
+
+    @GetMapping("/posts/{accountId}/like")
+    public ResponseDto<Object> viewAllPostUserLiked(@PathVariable Integer accountId) {
+        return ResponseDto.builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .data(postService.viewAllPostUserLiked(accountId))
+                .build();
+    }
+
     @GetMapping("/posts/{accountId}")
     public ResponseDto<Object> viewPostByAccountId(@PathVariable Integer accountId) {
         return ResponseDto.builder()
