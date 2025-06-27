@@ -1,6 +1,7 @@
 package com.kakan.forum_service.mapper;
 
 import com.kakan.forum_service.dto.PostDto;
+import com.kakan.forum_service.dto.response.PostLikedDto;
 import com.kakan.forum_service.pojo.Post;
 import com.kakan.forum_service.pojo.PostTopic;
 import org.mapstruct.Mapper;
@@ -19,6 +20,21 @@ public interface PostMapper {
     PostDto toDto(Post post);
 
     List<PostDto> toDtoList(List<Post> posts);
+
+    @Mapping(target = "liked", expression = "java(liked)")
+    PostLikedDto toPostLikedDto(PostDto postDto, boolean liked);
+
+    default List<PostLikedDto> toPostLikedDtoListTrue(List<PostDto> postDtoList) {
+        return postDtoList.stream()
+                .map(dto -> toPostLikedDto(dto, true))
+                .collect(Collectors.toList());
+    }
+
+    default List<PostLikedDto> toPostDtoListFalse(List<PostDto> postDtoList) {
+        return postDtoList.stream()
+                .map(dto -> toPostLikedDto(dto, false))
+                .collect(Collectors.toList());
+    }
 
     @Named("mapTopicNames")
     static List<String> mapTopicNames(List<PostTopic> postTopics) {

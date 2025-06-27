@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface PostLikeRepository extends JpaRepository<PostLike, PostLikeId> {
 
     List<PostLike> findByPost_Id(UUID postId);
+    List<PostLike> findByAccountId(Integer accountId);
 }

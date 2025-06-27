@@ -6,6 +6,7 @@ import com.kakan.account.grpc.UserResponse;
 import com.kakan.account.grpc.UserServiceGrpc;
 import com.kakan.forum_service.dto.PostDto;
 import com.kakan.forum_service.dto.request.CreatePostRequestDto;
+import com.kakan.forum_service.dto.response.PostLikedDto;
 import com.kakan.forum_service.enums.PostStatus;
 import com.kakan.forum_service.exception.PostNotFoundException;
 import com.kakan.forum_service.exception.ReportNotFoundException;
@@ -48,8 +49,30 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> viewAllPost() {
-        return List.of();
+    public List<PostLikedDto> viewAllPostUser(Integer accountId) {
+
+        List<PostDto> postDtoList = postMapper.toDtoList(postRepository.findAll());
+
+        List<PostLikedDto> likedDtoList = new ArrayList<>(postMapper.toPostDtoListFalse(postDtoList));
+
+        List<PostLike> postLikeList = postLikeRepository.findByAccountId(accountId);
+
+        List<PostDto> getPostFromPostLike = getPostFromPostLike(postLikeList);
+
+        likedDtoList.addAll(postMapper.toPostLikedDtoListTrue(getPostFromPostLike));
+
+        return likedDtoList;
+    }
+
+    private List<PostDto> getPostFromPostLike(List<PostLike> postLikeList) {
+
+        List<PostDto> postList = new ArrayList<>();
+
+        for (PostLike postLike : postLikeList) {
+            postList.add(postMapper.toDto(postLike.getPost()));
+        }
+
+        return postList;
     }
 
     @Override
@@ -184,6 +207,13 @@ public class PostServiceImpl implements PostService {
             accountIds.add(postLike.getAccountId());
         }
         return getAccountNameFromAccountService(accountIds);
+    }
+
+    @Override
+    public List<PostDto> viewAllPostUserLiked(Integer accountId) {
+        List<PostLike> postLikes = postLikeRepository.findByAccountId(accountId);
+
+        return getPostFromPostLike(postLikes);
     }
 
     private List<String> getAccountNameFromAccountService(List<Integer> accountIds) {
