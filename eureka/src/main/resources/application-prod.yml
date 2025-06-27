@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: eureka
+
+server:
+  port: 8070
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: false
+    register-with-eureka: false

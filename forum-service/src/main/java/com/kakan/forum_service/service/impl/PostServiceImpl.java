@@ -19,6 +19,7 @@ import io.grpc.ManagedChannelBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,9 @@ public class PostServiceImpl implements PostService {
     final TopicRepository topicRepository;
 
     final PostLikeRepository postLikeRepository;
+
+    @Value("${grpc.host}")
+    String host;
 
     @Override
     public List<PostDto> viewAllPostAdmin() {
@@ -217,7 +221,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private List<String> getAccountNameFromAccountService(List<Integer> accountIds) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(host, 9090)
                 .usePlaintext()
                 .build();
 

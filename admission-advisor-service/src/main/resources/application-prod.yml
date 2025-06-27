@@ -1,24 +1,25 @@
 server:
-  port: 8001
+  port: 8000
 spring:
   application:
-    name: forum-service
+    name: admission-advisor-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/forum_service_db
+    url: jdbc:postgresql://postgres:5432/admission_advisor_service_db
     username: postgres
     password: 12345
-
   main:
     banner-mode: off
     lazy-initialization: true
   jpa:
     properties:
       hibernate:
-        "format_sql": true
+        ddl-auto: none
+        format_sql: true
     show-sql: true
   sql:
     init:
       mode: always
+
 logging:
   level:
     root: warn
@@ -41,7 +42,9 @@ eureka:
     fetchRegistry: true
     registerWithEureka: true
     serviceUrl:
-      defaultZone: http://localhost:8070/eureka/
+      defaultZone: http://eureka:8070/eureka/
 
-grpc:
-  host: localhost
+gemini:
+  api:
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=
+    key: AIzaSyBXWR8BHNoMmA_T0mjHT1T6P_Q06NlGCQ0

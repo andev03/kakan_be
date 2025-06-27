@@ -4,7 +4,7 @@ spring:
   application:
     name: forum-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/forum_service_db
+    url: jdbc:postgresql://postgres:5432/forum_service_db
     username: postgres
     password: 12345
 
@@ -41,7 +41,7 @@ eureka:
     fetchRegistry: true
     registerWithEureka: true
     serviceUrl:
-      defaultZone: http://localhost:8070/eureka/
+      defaultZone: http://eureka:8070/eureka/
 
 grpc:
-  host: localhost
+  host: user-service
