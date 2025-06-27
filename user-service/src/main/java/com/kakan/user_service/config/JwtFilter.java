@@ -41,7 +41,8 @@ public class JwtFilter extends OncePerRequestFilter {
             "/login/oauth2/code/**",
             "/api/forgot-password",
             "/api/reset-password",
-            "/api/validate-otp"
+            "/api/validate-otp",
+            "/api/vnpay-return"
     );
 
     public boolean checkIsPublicAPI(String uri) {
