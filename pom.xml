@@ -18,6 +18,8 @@
         <module>admission-advisor-service</module>
         <module>forum-service</module>
         <module>school-service</module>
+        <module>order-service</module>
+        <module>payment-service</module>
         <module>user-service</module>
         <module>eureka</module>
         <module>gatewayserver</module>

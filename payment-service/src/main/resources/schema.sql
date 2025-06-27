@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS payment_methods CASCADE;
+DROP TABLE IF EXISTS payments CASCADE;
+
 CREATE TABLE payment_methods (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
