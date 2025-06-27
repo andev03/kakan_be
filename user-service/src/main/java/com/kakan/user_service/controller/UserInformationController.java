@@ -3,6 +3,7 @@ package com.kakan.user_service.controller;
 import com.kakan.user_service.dto.request.UpdateUserInformationRequest;
 import com.kakan.user_service.dto.response.ResponseDto;
 import com.kakan.user_service.dto.response.UserInformationDto;
+import com.kakan.user_service.dto.response.ViewUserInformationResponse;
 import com.kakan.user_service.exception.DuplicateEntity;
 import com.kakan.user_service.service.UserInformationService;
 import jakarta.validation.Valid;
@@ -40,10 +41,16 @@ public class UserInformationController {
 
     }
 
-    @PostMapping("/uploadImage")
-    public ResponseEntity uploadImage(@RequestPart MultipartFile file) {
-        userInformationService.uploadImage(file);
+    @PostMapping("/uploadImage/{id}")
+    public ResponseEntity uploadImage(@PathVariable int id,@RequestPart MultipartFile file) {
+        userInformationService.uploadImage(id,file);
         return ResponseEntity.ok("Uploaded image successfully");
+    }
+
+    @GetMapping("/user/information/")
+    public ResponseDto<ViewUserInformationResponse> getUserInformation() {
+        ViewUserInformationResponse userInformation = userInformationService.viewUserInformation();
+        return new ResponseDto<ViewUserInformationResponse>(HttpStatus.OK.value(), "Lấy thông tin người dùng thành công.", userInformation);
     }
 
 }

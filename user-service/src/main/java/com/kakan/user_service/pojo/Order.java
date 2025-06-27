@@ -37,9 +37,9 @@ public class Order {
     @Column(name = "expired_date", nullable = false)
     private OffsetDateTime expiredDate;
 
-    @Enumerated(EnumType.STRING)
+
     @Column(nullable = false, length = 10)
-    private OrderStatus status;
+    private String status;
 
     @Column(columnDefinition = "TEXT")
     private String note;

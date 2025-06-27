@@ -91,7 +91,7 @@ CREATE TABLE "order" (
   price            NUMERIC(12,2)            NOT NULL,
   order_date       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   expired_date     TIMESTAMP WITH TIME ZONE NOT NULL,
-  status           order_status,
+  status           VARCHAR(50),
   note             TEXT
 );
 
@@ -102,6 +102,6 @@ CREATE TABLE "transaction" (
   amount               NUMERIC(12,2)            NOT NULL,
   transaction_method   VARCHAR(100)             NOT NULL,
   transaction_date     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  status               transaction_status       NOT NULL,
+  status               VARCHAR(50)       NOT NULL,
   response_message     TEXT
 );

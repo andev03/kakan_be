@@ -2,7 +2,7 @@ package com.kakan.user_service.service.impl;
 
 import com.kakan.user_service.dto.request.UpdateUserInformationRequest;
 import com.kakan.user_service.dto.response.CloudinaryResponse;
-import com.kakan.user_service.dto.response.UserInformationDto;
+import com.kakan.user_service.dto.response.ViewUserInformationResponse;
 import com.kakan.user_service.exception.DuplicateEntity;
 import com.kakan.user_service.exception.NotFoundException;
 import com.kakan.user_service.pojo.Account;
@@ -11,6 +11,7 @@ import com.kakan.user_service.repository.AccountRepository;
 import com.kakan.user_service.repository.UserInformationRepository;
 import com.kakan.user_service.service.UserInformationService;
 import com.kakan.user_service.util.FileUpLoadUtil;
+import lombok.Builder;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Objects;
+
 
 @Service
 public class UserInformationServiceImpl implements UserInformationService {
@@ -68,9 +70,8 @@ public class UserInformationServiceImpl implements UserInformationService {
     }
 
     @Transactional
-    public void uploadImage(final MultipartFile file) {
-        Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final UserInformation userInformation = userInformationRepository.findByAccountId(account.getId());
+    public void uploadImage(int id, final MultipartFile file) {
+        final UserInformation userInformation = userInformationRepository.findByAccountId(id);
         if (userInformation == null) {
             throw new NotFoundException("Người dùng không tồn tại.");
         }
@@ -80,4 +81,22 @@ public class UserInformationServiceImpl implements UserInformationService {
         userInformation.setAvatarUrl(cloudinaryResponse.getUrl());
         userInformationRepository.save(userInformation);
     }
+
+    @Override
+    public ViewUserInformationResponse viewUserInformation() {
+        Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserInformation userInformation = userInformationRepository.findByAccountId(account.getId());
+        return ViewUserInformationResponse.builder()
+                .userId(userInformation.getUserId())
+                .fullName(userInformation.getFullName())
+                .gender(userInformation.getGender())
+                .dob(userInformation.getDob())
+                .phone(userInformation.getPhone())
+                .address(userInformation.getAddress())
+                .avatarUrl(userInformation.getAvatarUrl())
+                .gpa(userInformation.getGpa())
+                .build();
+    }
+
+
 }
