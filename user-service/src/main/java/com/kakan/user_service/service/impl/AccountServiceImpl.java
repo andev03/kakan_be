@@ -50,10 +50,7 @@ public class AccountServiceImpl implements AccountService {
         this.authenticationManager = authenticationManager;
     }
 
-    public List<Account> getAllAccounts(){
-        List<Account> accounts = accountRepository.findAll();
-        return accounts;
-    }
+
 
     public Account getAccountById(int id) {
         return accountRepository.findAccountById(id);

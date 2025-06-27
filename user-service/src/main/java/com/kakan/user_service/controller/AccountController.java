@@ -44,10 +44,7 @@ public class AccountController {
         Au = au;
     }
 
-    @GetMapping("/test")
-    public List<AccountDto> responseDto() {
-        return accountMapper.toDtoList(accountService.getAllAccounts());
-    }
+
 
     @GetMapping("/test2/{id}")
     public AccountDto getAccountById(@PathVariable int id) {

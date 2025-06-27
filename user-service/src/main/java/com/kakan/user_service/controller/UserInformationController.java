@@ -28,7 +28,7 @@ public class UserInformationController {
         this.userInformationService = userInformationService;
     }
 
-    @PutMapping("/user/information/{accountId}")
+    @PutMapping("/user/information")
     public ResponseDto<UpdateUserInformationRequest> updateUserInformation(@RequestBody UpdateUserInformationRequest request) {
         try{
             UpdateUserInformationRequest result = userInformationService.updateUserInformation(request);

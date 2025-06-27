@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.jsontype.impl.SubTypeValidator;
 import com.kakan.user_service.dto.SubjectScoreDto;
 import com.kakan.user_service.dto.request.ScoreRequest;
 import com.kakan.user_service.dto.response.BlockScoreResponeDto;
+import com.kakan.user_service.dto.response.CalculateScoreDto;
 import com.kakan.user_service.dto.response.GpaResponseDto;
 import com.kakan.user_service.dto.response.ViewScoreDetail;
 import com.kakan.user_service.mapper.SubjectMapper;
@@ -175,7 +176,18 @@ public class ScoreServiceImpl implements ScoreService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
 
+    public CalculateScoreDto calculateScore(List<SubjectScoreDto> dtos)
+    {
+        double gpa = calculateGpa(dtos);
+
+        List<BlockScoreResponeDto> blockScores = calculateBlockScore(dtos);
+
+        CalculateScoreDto calculateScoreDto = new CalculateScoreDto();
+        calculateScoreDto.setGpa(gpa);
+        calculateScoreDto.setBlockScores(blockScores);
+        return calculateScoreDto;
     }
 
 

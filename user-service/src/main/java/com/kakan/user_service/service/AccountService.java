@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface AccountService {
 
-    List<Account> getAllAccounts();
     Account getAccountById(int id);
    AccountResponse login(LoginRequest loginRequest);
 

@@ -2,10 +2,7 @@ package com.kakan.user_service.controller;
 
 import com.kakan.user_service.dto.SubjectScoreDto;
 import com.kakan.user_service.dto.request.ScoreRequest;
-import com.kakan.user_service.dto.response.BlockScoreResponeDto;
-import com.kakan.user_service.dto.response.GpaResponseDto;
-import com.kakan.user_service.dto.response.ResponseDto;
-import com.kakan.user_service.dto.response.ViewScoreDetail;
+import com.kakan.user_service.dto.response.*;
 import com.kakan.user_service.pojo.Score;
 import com.kakan.user_service.service.ScoreService;
 import jakarta.validation.Valid;
@@ -24,24 +21,30 @@ public class CalculateController {
         this.scoreService = scoreService;
     }
 
-    @PostMapping(value = "/calculate/gpa")
-    public ResponseDto<GpaResponseDto> submitScore(@RequestBody @Valid ScoreRequest dto) {
-        double gpa = scoreService.calculateGpa(dto.getSubjectScores());
-        GpaResponseDto responseDto = new GpaResponseDto(gpa);
-        return new ResponseDto<>(200, "GPA calculated successfully", responseDto);
+//    @PostMapping(value = "/calculate/gpa")
+//    public ResponseDto<GpaResponseDto> submitScore(@RequestBody @Valid ScoreRequest dto) {
+//        double gpa = scoreService.calculateGpa(dto.getSubjectScores());
+//        GpaResponseDto responseDto = new GpaResponseDto(gpa);
+//        return new ResponseDto<>(200, "GPA calculated successfully", responseDto);
+//
+//    }
 
-    }
 
-
-    @GetMapping(value = "/view/gpa")
+    @GetMapping(value = "/view/scoreDetail")
     public ResponseDto<List<ViewScoreDetail>> viewScoreDetail() {
         List<ViewScoreDetail> viewScoreDetail = scoreService.getScoreDetails();
         return new ResponseDto<>(200, "Score details fetched successfully", viewScoreDetail);
     }
 
-    @PostMapping(value = "/calculate/block-score")
-    public ResponseDto<List<BlockScoreResponeDto>> calculateBlockScore(@RequestBody @Valid ScoreRequest dto) {
-        List<BlockScoreResponeDto> blockScores = scoreService.calculateBlockScore(dto.getSubjectScores());
-        return new ResponseDto<>(200, "Block scores calculated successfully", blockScores);
+//    @PostMapping(value = "/calculate/block-score")
+//    public ResponseDto<List<BlockScoreResponeDto>> calculateBlockScore(@RequestBody @Valid ScoreRequest dto) {
+//        List<BlockScoreResponeDto> blockScores = scoreService.calculateBlockScore(dto.getSubjectScores());
+//        return new ResponseDto<>(200, "Block scores calculated successfully", blockScores);
+//    }
+
+    @PostMapping(value = "/calculate/score")
+    public ResponseDto<CalculateScoreDto> calculateScore(@RequestBody @Valid ScoreRequest dto) {
+        CalculateScoreDto score = scoreService.calculateScore(dto.getSubjectScores());
+        return new ResponseDto<>(200, "Scores calculated successfully", score);
     }
 }

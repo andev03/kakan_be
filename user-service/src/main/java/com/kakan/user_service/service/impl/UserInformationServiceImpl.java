@@ -59,6 +59,10 @@ public class UserInformationServiceImpl implements UserInformationService {
             if (!Objects.equals(request.getAddress(), userInformation.getAddress())) {
                 userInformation.setAddress(request.getAddress());
             }
+            // Xử lý upload ảnh nếu có
+            if (request.getAvatarUrl() != null && !request.getAvatarUrl().isEmpty()) {
+                uploadImage(account.getId(), request.getAvatarUrl());
+            }
             userInformationRepository.save(userInformation);
             return modelMapper.map(userInformation, UpdateUserInformationRequest.class);
         }catch (DuplicateEntity e) {
