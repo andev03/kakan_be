@@ -55,25 +55,28 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostLikedDto> viewAllPostUser(Integer accountId) {
 
-        List<PostDto> postDtoList = postMapper.toDtoList(postRepository.findAll());
-
-        List<PostLikedDto> likedDtoList = new ArrayList<>(postMapper.toPostDtoListFalse(postDtoList));
-
         List<PostLike> postLikeList = postLikeRepository.findByAccountId(accountId);
 
-        List<PostDto> getPostFromPostLike = getPostFromPostLike(postLikeList);
+        List<UUID> postIds = new ArrayList<>();
+
+        List<PostDto> getPostFromPostLike = getPostFromPostLike(postLikeList, postIds);
+
+        List<PostDto> postDtoList = postMapper.toDtoList(postRepository.findByIdNotIn(postIds));
+
+        List<PostLikedDto> likedDtoList = new ArrayList<>(postMapper.toPostDtoListFalse(postDtoList));
 
         likedDtoList.addAll(postMapper.toPostLikedDtoListTrue(getPostFromPostLike));
 
         return likedDtoList;
     }
 
-    private List<PostDto> getPostFromPostLike(List<PostLike> postLikeList) {
+    private List<PostDto> getPostFromPostLike(List<PostLike> postLikeList, List<UUID> postIds) {
 
         List<PostDto> postList = new ArrayList<>();
 
         for (PostLike postLike : postLikeList) {
             postList.add(postMapper.toDto(postLike.getPost()));
+            postIds.add(postLike.getPost().getId());
         }
 
         return postList;
@@ -217,7 +220,18 @@ public class PostServiceImpl implements PostService {
     public List<PostDto> viewAllPostUserLiked(Integer accountId) {
         List<PostLike> postLikes = postLikeRepository.findByAccountId(accountId);
 
-        return getPostFromPostLike(postLikes);
+        return getPostFromPostLikeForAll(postLikes);
+    }
+
+    private List<PostDto> getPostFromPostLikeForAll(List<PostLike> postLikeList) {
+
+        List<PostDto> postList = new ArrayList<>();
+
+        for (PostLike postLike : postLikeList) {
+            postList.add(postMapper.toDto(postLike.getPost()));
+        }
+
+        return postList;
     }
 
     private List<String> getAccountNameFromAccountService(List<Integer> accountIds) {

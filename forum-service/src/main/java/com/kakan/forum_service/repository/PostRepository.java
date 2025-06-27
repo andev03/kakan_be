@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface PostRepository extends JpaRepository<Post, UUID> {
 
     List<Post> findByAccountId(Integer accountId);
+
+    List<Post> findByIdNotIn(List<UUID> postId);
 }

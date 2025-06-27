@@ -149,11 +149,12 @@ VALUES (1, 1, 8.5, 8.0, 8.2),
 
 -- "order"
 INSERT INTO "order" (account_id, package_name, package_duration, price, order_date, expired_date, status, note)
-VALUES (1, 'premium 3 months', 3, 1500000, '2025-05-01 10:30:00+07', '2025-08-01 10:30:00+07', 'ACTIVE',
-        'Thanh toán đầy đủ bằng thẻ'),
-       (2, 'basic 1 month', 1, 300000, '2025-06-01 14:00:00+07', '2025-07-01 14:00:00+07', 'PENDING', 'Chờ thanh toán');
+VALUES
+  (1, 'Premium', 30, 50000, '2025-05-01 10:30:00+07', '2025-08-01 10:30:00+07', 'ACTIVE',   'Đã thanh toán, đơn hàng đã được kích hoạt'),
+  (2, 'Premium', 30, 50000, '2025-06-01 14:00:00+07', '2025-07-01 14:00:00+07', 'PENDING',  'Chờ thanh toán');
 
 -- "transaction"
 INSERT INTO "transaction" (order_id, amount, transaction_method, transaction_date, status, response_message)
-VALUES (1, 1500000, 'momo', '2025-05-01 10:31:00+07', 'SUCCESS', 'Thanh toán thành công'),
-       (2, 300000, 'credit_card', '2025-06-01 14:05:00+07', 'FAILED', 'Thẻ không đủ tiền');
+VALUES
+  (1, 50000, 'VNPay', '2025-05-01 10:31:00+07', 'SUCCESS', 'Thanh toán thành công'),
+  (2, 50000, 'VNPay', '2025-06-01 14:05:00+07', 'FAILED',  'Thẻ không đủ tiền');
