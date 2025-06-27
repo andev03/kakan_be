@@ -6,6 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UserInformationService {
     UpdateUserInformationRequest updateUserInformation(UpdateUserInformationRequest request);
-    void uploadImage(final MultipartFile file);
+    void uploadImage(int id, final MultipartFile file);
 
 }

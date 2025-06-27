@@ -27,7 +27,7 @@ public class UserInformationController {
         this.userInformationService = userInformationService;
     }
 
-    @PutMapping("/user/information/{accountId}")
+    @PutMapping("/user/information")
     public ResponseDto<UpdateUserInformationRequest> updateUserInformation(@RequestBody UpdateUserInformationRequest request) {
         try{
             UpdateUserInformationRequest result = userInformationService.updateUserInformation(request);
@@ -40,9 +40,9 @@ public class UserInformationController {
 
     }
 
-    @PostMapping("/uploadImage")
-    public ResponseEntity uploadImage(@RequestPart MultipartFile file) {
-        userInformationService.uploadImage(file);
+    @PostMapping("/uploadImage/{id}")
+    public ResponseEntity uploadImage(@PathVariable int id,@RequestPart MultipartFile file) {
+        userInformationService.uploadImage(id,file);
         return ResponseEntity.ok("Uploaded image successfully");
     }
 

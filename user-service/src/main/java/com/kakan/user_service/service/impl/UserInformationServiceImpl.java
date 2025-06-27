@@ -57,6 +57,10 @@ public class UserInformationServiceImpl implements UserInformationService {
             if (!Objects.equals(request.getAddress(), userInformation.getAddress())) {
                 userInformation.setAddress(request.getAddress());
             }
+            // Xử lý upload ảnh nếu có
+            if (request.getAvatarUrl() != null && !request.getAvatarUrl().isEmpty()) {
+                uploadImage(account.getId(), request.getAvatarUrl());
+            }
             userInformationRepository.save(userInformation);
             return modelMapper.map(userInformation, UpdateUserInformationRequest.class);
         }catch (DuplicateEntity e) {
@@ -68,9 +72,8 @@ public class UserInformationServiceImpl implements UserInformationService {
     }
 
     @Transactional
-    public void uploadImage(final MultipartFile file) {
-        Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final UserInformation userInformation = userInformationRepository.findByAccountId(account.getId());
+    public void uploadImage(int id, final MultipartFile file) {
+        final UserInformation userInformation = userInformationRepository.findByAccountId(id);
         if (userInformation == null) {
             throw new NotFoundException("Người dùng không tồn tại.");
         }
