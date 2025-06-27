@@ -59,7 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/login", "/api/register", "/api/loginByGoogle",
                                 "/oauth2/authorization/**", "/login/oauth2/code/**",
                                 "/api/forgot-password", "/api/reset-password", "/api/validate-otp",
-                                "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
+                                "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/api/vnpay-return").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
