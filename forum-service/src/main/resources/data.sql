@@ -1,8 +1,21 @@
-INSERT INTO post (id, account_id, content, status)
+INSERT INTO topic (name)
 VALUES
-    ('00000000-0000-0000-0000-000000000001', 1, 'Hello world from user 1!', 'ACTIVE'),
-    ('00000000-0000-0000-0000-000000000002', 2, 'Spring Boot tips and tricks', 'ACTIVE'),
-    ('00000000-0000-0000-0000-000000000003', 3, 'Should I learn Kotlin?', 'BLOCKED');
+    ('Introduction'),
+    ('Programming'),
+    ('Technology'),
+    ('Others');
+
+INSERT INTO post (id, account_id, title, content, status)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 1, 'Welcome Post', 'Hello world from user 1!', 'ACTIVE'),
+    ('00000000-0000-0000-0000-000000000002', 2, 'Spring Boot Tips', 'Spring Boot tips and tricks', 'ACTIVE'),
+    ('00000000-0000-0000-0000-000000000003', 3, 'Kotlin Dilemma', 'Should I learn Kotlin?', 'BLOCKED');
+
+INSERT INTO post_topic (post_id, topic_id)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 1),
+    ('00000000-0000-0000-0000-000000000002', 2),
+    ('00000000-0000-0000-0000-000000000003', 3);
 
 INSERT INTO comment (post_id, account_id, content)
 VALUES

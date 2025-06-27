@@ -1,7 +1,5 @@
-package com.kakan.forum_service.dto;
+package com.kakan.forum_service.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +7,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Builder
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class PostDto {
-
+public class PostLikedDto {
     UUID id;
 
     String title;
@@ -32,4 +27,6 @@ public class PostDto {
     LocalDateTime createdAt;
 
     List<String> topicName;
+
+    boolean liked;
 }

@@ -1,37 +1,46 @@
 package com.kakan.user_service.service.impl;
 
+import com.google.protobuf.Timestamp;
+import com.google.protobuf.util.Timestamps;
+import com.google.type.DateTime;
+import com.kakan.account.grpc.UserIdListRequest;
+import com.kakan.account.grpc.UserListResponse;
+import com.kakan.account.grpc.UserResponse;
+import com.kakan.account.grpc.UserServiceGrpc;
+import com.kakan.user_service.dto.UserInformationGrpcDto;
 import com.kakan.user_service.dto.request.LoginRequest;
-import com.kakan.user_service.dto.request.RegisterRequest;
+import com.kakan.user_service.dto.response.AccountDto;
 import com.kakan.user_service.dto.response.AccountResponse;
-import com.kakan.user_service.enums.AccountRole;
-import com.kakan.user_service.exception.DuplicateEntity;
+import com.kakan.user_service.dto.response.UserInformationDto;
+import com.kakan.user_service.mapper.AccountMapper;
+import com.kakan.user_service.mapper.UserInformationMapper;
 import com.kakan.user_service.model.UserPrincipal;
 import com.kakan.user_service.pojo.Account;
-import com.kakan.user_service.pojo.UserInformation;
 import com.kakan.user_service.repository.AccountRepository;
 import com.kakan.user_service.repository.UserInformationRepository;
 import com.kakan.user_service.service.AccountService;
+import io.grpc.Status;
+import io.grpc.stub.StreamObserver;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.NotFoundException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.grpc.server.service.GrpcService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AccountServiceImpl implements AccountService {
+@GrpcService
+public class AccountServiceImpl extends UserServiceGrpc.UserServiceImplBase implements AccountService {
 
 
     @Autowired
@@ -40,24 +49,32 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     ModelMapper modelMapper;
 
+    final UserInformationRepository userInformationRepository;
+
+    final UserInformationMapper userInformationMapper;
 
     @Autowired
     private TokenService tokenService;
 
     final AuthenticationManager authenticationManager;
 
-    public AccountServiceImpl(AuthenticationManager authenticationManager) {
+    public AccountServiceImpl(UserInformationRepository userInformationRepository, UserInformationMapper userInformationMapper, AuthenticationManager authenticationManager) {
+        this.userInformationRepository = userInformationRepository;
+        this.userInformationMapper = userInformationMapper;
         this.authenticationManager = authenticationManager;
     }
 
-
+    public List<Account> getAllAccounts() {
+        List<Account> accounts = accountRepository.findAll();
+        return accounts;
+    }
 
     public Account getAccountById(int id) {
         return accountRepository.findAccountById(id);
     }
 
     public AccountResponse login(LoginRequest loginRequest) {
-        try{
+        try {
             Authentication authentication =
                     authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(
@@ -73,11 +90,11 @@ public class AccountServiceImpl implements AccountService {
 
             //tạo token cho tài khoản
             AccountResponse accountResponse = modelMapper.map(account, AccountResponse.class);
-            if(authentication.isAuthenticated()){
+            if (authentication.isAuthenticated()) {
                 accountResponse.setToken(tokenService.generateToken(account));
             }
             return accountResponse;
-        }catch (NotFoundException e) {
+        } catch (NotFoundException e) {
             // Nếu tài khoản bị vô hiệu hóa
             throw new NotFoundException("Tài khoản đã bị vô hiệu hóa!");
         } catch (BadCredentialsException e) {
@@ -87,6 +104,43 @@ public class AccountServiceImpl implements AccountService {
             // Xử lý các lỗi khác
             e.printStackTrace();
             throw new RuntimeException("Đã xảy ra lỗi trong quá trình đăng nhập, vui lòng thử lại sau.");
+        }
+    }
+
+    @Override
+    public void getUsersByIds(UserIdListRequest request, StreamObserver<UserListResponse> responseObserver) {
+        try {
+            List<Integer> ids = request.getUserIdsList();
+            List<UserInformationGrpcDto> users = userInformationMapper.toGrpcDtoList(userInformationRepository.findAllByAccountIdIn(ids));
+
+            UserListResponse.Builder responseBuilder = UserListResponse.newBuilder();
+
+            for (UserInformationGrpcDto user : users) {
+                DateTime dob = DateTime.newBuilder()
+                        .setYear(user.getDob().getYear())
+                        .setMonth(user.getDob().getMonthValue())
+                        .setDay(user.getDob().getDayOfMonth())
+                        .build();
+                UserResponse userResponse = UserResponse.newBuilder()
+                        .setId(user.getUserId())
+                        .setFullName(user.getFullName())
+                        .setGender(user.getGender())
+                        .setDob(dob)
+                        .setPhone(user.getPhone())
+                        .setAddress(user.getAddress())
+                        .setAvatarUrl(Optional.ofNullable(user.getAvatarUrl()).orElse(""))
+                        .build();
+                responseBuilder.addUsers(userResponse);
+            }
+
+            responseObserver.onNext(responseBuilder.build());
+            responseObserver.onCompleted();
+
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL
+                    .withDescription("Server error: " + e.getMessage())
+                    .withCause(e)
+                    .asRuntimeException());
         }
     }
 }

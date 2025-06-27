@@ -28,12 +28,30 @@ public class PostController {
 
     final PostService postService;
 
-    @GetMapping("/posts")
-    public ResponseDto<Object> viewAllPost() {
+    @GetMapping("/posts/admin")
+    public ResponseDto<Object> viewAllPostAdmin() {
         return ResponseDto.builder()
                 .status(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
-                .data(postService.viewAllPost())
+                .data(postService.viewAllPostAdmin())
+                .build();
+    }
+
+    @GetMapping("/posts/all/{accountId}")
+    public ResponseDto<Object> viewAllPostUser(@PathVariable Integer accountId) {
+        return ResponseDto.builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .data(postService.viewAllPostUser(accountId))
+                .build();
+    }
+
+    @GetMapping("/posts/{accountId}/like")
+    public ResponseDto<Object> viewAllPostUserLiked(@PathVariable Integer accountId) {
+        return ResponseDto.builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .data(postService.viewAllPostUserLiked(accountId))
                 .build();
     }
 
@@ -46,12 +64,12 @@ public class PostController {
                 .build();
     }
 
-    @PutMapping("/post/{postId}/like")
-    public ResponseDto<Object> likePostByPostId(@PathVariable UUID postId) {
+    @PutMapping("/post/{postId}/{accountId}/like")
+    public ResponseDto<Object> likePostByPostId(@PathVariable UUID postId, @PathVariable Integer accountId) {
         return ResponseDto.builder()
                 .status(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
-                .data(postService.likePostByPostId(postId))
+                .data(postService.likePostByPostId(postId, accountId))
                 .build();
     }
 
@@ -97,6 +115,15 @@ public class PostController {
                 .status(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
                 .data(postService.viewPostByPostId(postId))
+                .build();
+    }
+
+    @GetMapping("/post/{postId}/like")
+    public ResponseDto<Object> viewUserNameLiked(@PathVariable UUID postId) {
+        return ResponseDto.builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .data(postService.viewUserNameLiked(postId))
                 .build();
     }
 }

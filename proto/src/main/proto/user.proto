@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.kakan.account.grpc";
+option java_outer_classname = "UserProto";
+
+import "google/protobuf/timestamp.proto";
+import "google/type/datetime.proto";
+
+service UserService {
+    rpc GetUsersByIds(UserIdListRequest) returns (UserListResponse);
+}
+
+message UserIdListRequest {
+    repeated int32 userIds = 1;
+}
+
+message UserResponse {
+    int32 id = 1;
+    string fullName = 2;
+    bool gender = 3;
+    google.type.DateTime dob = 4;
+    string phone = 5;
+    string address = 6;
+    string avatarUrl = 7;
+    double gpa = 8;
+}
+
+message UserListResponse {
+    repeated UserResponse users = 1;
+}

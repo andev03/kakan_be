@@ -1,9 +1,7 @@
 package com.kakan.forum_service.controller;
 
-import com.kakan.forum_service.dto.ReportDto;
 import com.kakan.forum_service.dto.request.CreateReportRequestDto;
 import com.kakan.forum_service.dto.response.ResponseDto;
-import com.kakan.forum_service.pojo.Report;
 import com.kakan.forum_service.service.ReportService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
