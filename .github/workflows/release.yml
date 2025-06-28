@@ -19,23 +19,14 @@ jobs:
         id: uuid
         run: echo "TAG=$(uuidgen)" >> $GITHUB_ENV
 
-      - name: Build and push Docker images
-        run: |
-          services=(
-            eureka
-            gatewayserver
-            admission-advisor-service
-            forum-service
-            school-service
-            user-service
-            order-service
-            payment-service
-          )
+      - name: Inject version tag into docker-compose.yml
+        run: sed -i "s/:latest/:$TAG/g" docker-compose.yml
 
-          for service in "${services[@]}"; do
-            docker build -t ${{ secrets.DOCKER_USERNAME }}/$service:$TAG -f $service/Dockerfile .
-            docker push ${{ secrets.DOCKER_USERNAME }}/$service:$TAG
-          done
+      - name: Build all images using Docker Compose
+        run: docker compose build
+
+      - name: Push all images using Docker Compose
+        run: docker compose push
 
       - name: Upload docker-compose.yml to VPS
         uses: appleboy/scp-action@v0.1.4
@@ -54,7 +45,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /home/kakan/microservices
-            sed -i "s/:latest/:$TAG/g" docker-compose.yml
             docker compose pull
             docker compose down
             docker compose up -d --remove-orphans
