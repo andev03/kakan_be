@@ -49,7 +49,8 @@ services:
     ports:
       - "8800:8800"
     depends_on:
-      - eureka
+      eureka:
+        condition: service_started
     environment:
       SPRING_PROFILES_ACTIVE: prod
     networks:
@@ -66,8 +67,10 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
     depends_on:
-      - postgres
-      - eureka
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_started
     networks:
       - backend
 
@@ -82,8 +85,10 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
     depends_on:
-      - postgres
-      - eureka
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_started
     networks:
       - backend
 
@@ -96,8 +101,10 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/school_service_db
     depends_on:
-      - mongo
-      - eureka
+      mongo:
+        condition: service_healthy
+      eureka:
+        condition: service_started
     networks:
       - backend
 
@@ -112,8 +119,10 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
     depends_on:
-      - postgres
-      - eureka
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_started
     networks:
       - backend
 
@@ -128,8 +137,10 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
     depends_on:
-      - postgres
-      - eureka
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_started
     networks:
       - backend
 
@@ -144,8 +155,10 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
     depends_on:
-      - postgres
-      - eureka
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_started
     networks:
       - backend
 
