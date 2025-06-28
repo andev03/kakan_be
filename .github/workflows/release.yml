@@ -20,24 +20,24 @@ jobs:
         run: echo "TAG=$(uuidgen)" >> $GITHUB_ENV
 
       - name: Replace :latest with UUID tag in build file
-        run: sed -i "s/:latest/:$TAG/g" docker-compose.yml
+        run: sed -i "s/:latest/:$TAG/g" docker-compose.build.yml
 
       - name: Build all images using Docker Compose
-        run: docker compose -f docker-compose.yml build
+        run: docker compose -f docker-compose.build.yml build
 
       - name: Push all images using Docker Compose
-        run: docker compose -f docker-compose.yml push
+        run: docker compose -f docker-compose.build.yml push
 
       - name: Replace :latest with UUID tag in deploy file
-        run: sed -i "s/:latest/:$TAG/g" docker-compose.yml
+        run: sed -i "s/:latest/:$TAG/g" docker-compose.deploy.yml
 
-      - name: Upload deploy docker-compose.yml to VPS
+      - name: Upload deploy docker-compose.build.yml to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.VPS_HOST }}
           username: kakan
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: "docker-compose.yml"
+          source: "docker-compose.deploy.yml"
           target: "/home/kakan/microservices"
 
       - name: Deploy to VPS via SSH
@@ -48,6 +48,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /home/kakan/microservices
-            docker compose -f docker-compose.yml pull
-            docker compose -f docker-compose.yml down
-            docker compose -f docker-compose.yml up -d --remove-orphans
+            docker compose -f docker-compose.deploy.yml pull
+            docker compose -f docker-compose.deploy.yml down
+            docker compose -f docker-compose.deploy.yml up -d --remove-orphans

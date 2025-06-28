@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  eureka:
+    build:
+      context: .
+      dockerfile: eureka/Dockerfile
+    image: andev368/eureka:latest
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gatewayserver/Dockerfile
+    image: andev368/gateway:latest
+
+  admission-advisor-service:
+    build:
+      context: .
+      dockerfile: admission-advisor-service/Dockerfile
+    image: andev368/admission-advisor-service:latest
+
+  forum-service:
+    build:
+      context: .
+      dockerfile: forum-service/Dockerfile
+    image: andev368/forum-service:latest
+
+  school-service:
+    build:
+      context: .
+      dockerfile: school-service/Dockerfile
+    image: andev368/school-service:latest
+
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    image: andev368/user-service:latest
+
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    image: andev368/order-service:latest
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    image: andev368/payment-service:latest

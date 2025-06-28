@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   postgres:
     image: postgres:15
@@ -32,9 +34,7 @@ services:
       retries: 5
 
   eureka:
-    build:
-      context: .
-      dockerfile: eureka/Dockerfile
+    image: andev368/eureka:latest
     container_name: eureka
     ports:
       - "8070:8070"
@@ -44,24 +44,19 @@ services:
       - backend
 
   gateway:
-    build:
-      context: .
-      dockerfile: gatewayserver/Dockerfile
+    image: andev368/gateway:latest
     container_name: gateway
     ports:
       - "8800:8800"
     depends_on:
-      eureka:
-        condition: service_started
+      - eureka
     environment:
       SPRING_PROFILES_ACTIVE: prod
     networks:
       - backend
 
   admission-advisor-service:
-    build:
-      context: .
-      dockerfile: admission-advisor-service/Dockerfile
+    image: andev368/admission-advisor-service:latest
     container_name: admission-advisor-service
     ports:
       - "8000:8000"
@@ -71,17 +66,13 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
     depends_on:
-      postgres:
-        condition: service_healthy
-      eureka:
-        condition: service_started
+      - postgres
+      - eureka
     networks:
       - backend
 
   forum-service:
-    build:
-      context: .
-      dockerfile: forum-service/Dockerfile
+    image: andev368/forum-service:latest
     container_name: forum-service
     ports:
       - "8001:8001"
@@ -91,17 +82,13 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
     depends_on:
-      postgres:
-        condition: service_healthy
-      eureka:
-        condition: service_started
+      - postgres
+      - eureka
     networks:
       - backend
 
   school-service:
-    build:
-      context: .
-      dockerfile: school-service/Dockerfile
+    image: andev368/school-service:latest
     container_name: school-service
     ports:
       - "8002:8002"
@@ -109,17 +96,13 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/school_service_db
     depends_on:
-      mongo:
-        condition: service_healthy
-      eureka:
-        condition: service_started
+      - mongo
+      - eureka
     networks:
       - backend
 
   user-service:
-    build:
-      context: .
-      dockerfile: user-service/Dockerfile
+    image: andev368/user-service:latest
     container_name: user-service
     ports:
       - "8003:8003"
@@ -129,17 +112,13 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
     depends_on:
-      postgres:
-        condition: service_healthy
-      eureka:
-        condition: service_started
+      - postgres
+      - eureka
     networks:
       - backend
 
   order-service:
-    build:
-      context: .
-      dockerfile: order-service/Dockerfile
+    image: andev368/order-service:latest
     container_name: order-service
     ports:
       - "8004:8004"
@@ -149,17 +128,13 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
     depends_on:
-      postgres:
-        condition: service_healthy
-      eureka:
-        condition: service_started
+      - postgres
+      - eureka
     networks:
       - backend
 
   payment-service:
-    build:
-      context: .
-      dockerfile: payment-service/Dockerfile
+    image: andev368/payment-service:latest
     container_name: payment-service
     ports:
       - "8005:8005"
@@ -169,10 +144,8 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
     depends_on:
-      postgres:
-        condition: service_healthy
-      eureka:
-        condition: service_started
+      - postgres
+      - eureka
     networks:
       - backend
 
