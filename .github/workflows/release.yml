@@ -20,16 +20,16 @@ jobs:
         run: echo "TAG=$(uuidgen)" >> $GITHUB_ENV
 
       - name: Replace :latest with UUID tag in build file
-        run: sed -i "s/:latest/:$TAG/g" docker-compose.build.yml
+        run: sed -i "s/:latest/:$TAG/g" docker-compose.yml
 
       - name: Build all images using Docker Compose
-        run: docker compose -f docker-compose.build.yml build
+        run: docker compose -f docker-compose.yml build
 
       - name: Push all images using Docker Compose
-        run: docker compose -f docker-compose.build.yml push
+        run: docker compose -f docker-compose.yml push
 
       - name: Replace :latest with UUID tag in deploy file
-        run: sed -i "s/:latest/:$TAG/g" docker-compose.deploy.yml
+        run: sed -i "s/:latest/:$TAG/g" docker-compose.yml
 
       - name: Upload deploy docker-compose.yml to VPS
         uses: appleboy/scp-action@v0.1.4
