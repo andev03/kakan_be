@@ -37,10 +37,10 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: kakan
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: "init-db/*"
+          source: "init-db"
           target: "/home/kakan/microservices"
 
-      - name: Upload deploy docker-compose.deploy.yml to VPS
+      - name: Upload docker-compose.deploy.yml to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -49,16 +49,17 @@ jobs:
           source: "docker-compose.deploy.yml"
           target: "/home/kakan/microservices"
 
-      - name: Remove old pgdata (optional)
+      - name: Stop and remove containers + volume
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: kakan
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            docker volume rm $(docker volume ls -q --filter name=pgdata) || true
+            cd /home/kakan/microservices
+            docker compose -f docker-compose.deploy.yml down -v || true
 
-      - name: Deploy to VPS via SSH
+      - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -67,5 +68,4 @@ jobs:
           script: |
             cd /home/kakan/microservices
             docker compose -f docker-compose.deploy.yml pull
-            docker compose -f docker-compose.deploy.yml down
             docker compose -f docker-compose.deploy.yml up -d --remove-orphans
