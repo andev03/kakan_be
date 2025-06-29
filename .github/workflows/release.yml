@@ -31,15 +31,22 @@ jobs:
       - name: Replace :latest with UUID tag in deploy file
         run: sed -i "s/:latest/:$TAG/g" docker-compose.deploy.yml
 
-      - name: Upload deploy file and init-db to VPS
+      - name: Upload init-db folder to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.VPS_HOST }}
           username: kakan
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: |
-            docker-compose.deploy.yml
-            init-db
+          source: "init-db/*"
+          target: "/home/kakan/microservices/init-db"
+
+      - name: Upload deploy docker-compose.deploy.yml to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: kakan
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "docker-compose.deploy.yml"
           target: "/home/kakan/microservices"
 
       - name: Deploy to VPS via SSH
