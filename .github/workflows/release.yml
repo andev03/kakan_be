@@ -38,7 +38,7 @@ jobs:
           username: kakan
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "init-db/*"
-          target: "/home/kakan/microservices/init-db"
+          target: "/home/kakan/microservices"
 
       - name: Upload deploy docker-compose.deploy.yml to VPS
         uses: appleboy/scp-action@v0.1.4
