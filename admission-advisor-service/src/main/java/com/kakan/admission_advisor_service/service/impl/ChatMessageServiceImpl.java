@@ -1,15 +1,11 @@
 package com.kakan.admission_advisor_service.service.impl;
 
-import com.kakan.admission_advisor_service.dto.ChatMessageDto;
 import com.kakan.admission_advisor_service.dto.request.ChatMessageRequestDto;
 import com.kakan.admission_advisor_service.dto.response.SendChatResponseDto;
 import com.kakan.admission_advisor_service.enums.Sender;
 import com.kakan.admission_advisor_service.mapper.ChatMessageMapper;
-import com.kakan.admission_advisor_service.mapper.ChatSessionMapper;
 import com.kakan.admission_advisor_service.pojo.ChatMessage;
-import com.kakan.admission_advisor_service.pojo.ChatSession;
 import com.kakan.admission_advisor_service.repository.ChatMessageRepository;
-import com.kakan.admission_advisor_service.repository.ChatSessionRepository;
 import com.kakan.admission_advisor_service.service.ChatMessageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -38,23 +32,13 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Value("${gemini.api.key}")
     String geminiApiKey;
 
-    final ChatSessionMapper chatSessionMapper;
-
     final ChatMessageMapper chatMessageMapper;
 
     final ChatMessageRepository chatMessageRepository;
 
-    final ChatSessionRepository chatSessionRepository;
-
-    @Override
-    public List<ChatMessageDto> getAllChatMessageByAccountIdAndSessionId(Integer accountId, UUID sessionId) {
-        return chatMessageMapper.toDtoList(chatMessageRepository.findBySenderIdAndSessionId(accountId, sessionId));
-    }
-
     @Override
     @Transactional
     public SendChatResponseDto chatMessageWithAdmission(ChatMessageRequestDto chatMessageRequestDto) {
-        ChatSession chatSession = validateChatSession(chatMessageRequestDto);
 
         ChatMessage chatMessage =
                 chatMessageRepository.save(
@@ -63,30 +47,13 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                                 .deletedAt(null)
                                 .senderId(chatMessageRequestDto.getSenderId())
                                 .senderType(Sender.USER.toString().toLowerCase())
-                                .session(chatSession)
                                 .build()
                 );
 
         return SendChatResponseDto.builder()
                 .chatUserDto(chatMessageMapper.toDto(chatMessage))
-                .chatSessionDto(chatSessionMapper.toDto(chatSession))
                 .chatAI(chatMessageMapper.toDto(saveChatAi(chatMessageRequestDto, chatMessage)))
                 .build();
-    }
-
-    @Transactional
-    private ChatSession validateChatSession(ChatMessageRequestDto chatMessageRequestDto) {
-        ChatSession chatSession = chatSessionRepository.findById(chatMessageRequestDto.getSessionId()).orElse(null);
-
-        if (chatSession == null) {
-            return chatSessionRepository.save(
-                    ChatSession.builder()
-                            .title(chatMessageRequestDto.getMessage())
-                            .accountId(chatMessageRequestDto.getSenderId())
-                            .build()
-            );
-        }
-        return chatSession;
     }
 
     @Transactional
@@ -95,7 +62,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
         return chatMessageRepository.save(
                 ChatMessage.builder()
-                        .session(chatMessage.getSession())
                         .content(messageResponseAi)
                         .senderType(Sender.BOT.toString().toLowerCase())
                         .build()

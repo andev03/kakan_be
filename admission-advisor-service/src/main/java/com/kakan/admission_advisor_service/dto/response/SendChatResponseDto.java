@@ -1,8 +1,6 @@
 package com.kakan.admission_advisor_service.dto.response;
 
 import com.kakan.admission_advisor_service.dto.ChatMessageDto;
-import com.kakan.admission_advisor_service.dto.ChatSessionDto;
-import com.kakan.admission_advisor_service.pojo.ChatMessage;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,8 +11,6 @@ import lombok.Setter;
 public class SendChatResponseDto {
 
     ChatMessageDto chatUserDto;
-
-    ChatSessionDto chatSessionDto;
 
     ChatMessageDto chatAI;
 }
