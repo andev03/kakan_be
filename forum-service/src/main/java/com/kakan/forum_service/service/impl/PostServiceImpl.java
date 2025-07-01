@@ -57,29 +57,29 @@ public class PostServiceImpl implements PostService {
 
         List<PostLike> postLikeList = postLikeRepository.findByAccountId(accountId);
 
-        List<UUID> postIds = new ArrayList<>();
+        List<PostDto> postList = postMapper.toDtoList(postRepository.findAll());
 
-        List<PostDto> getPostFromPostLike = getPostFromPostLike(postLikeList, postIds);
-
-        List<PostDto> postDtoList = postMapper.toDtoList(postRepository.findByIdNotIn(postIds));
-
-        List<PostLikedDto> likedDtoList = new ArrayList<>(postMapper.toPostDtoListFalse(postDtoList));
-
-        likedDtoList.addAll(postMapper.toPostLikedDtoListTrue(getPostFromPostLike));
-
-        return likedDtoList;
+        return getPostFromPostLike(postLikeList, postList);
     }
 
-    private List<PostDto> getPostFromPostLike(List<PostLike> postLikeList, List<UUID> postIds) {
+    private List<PostLikedDto> getPostFromPostLike(List<PostLike> postLikeList, List<PostDto> postLists) {
 
-        List<PostDto> postList = new ArrayList<>();
+        List<PostLikedDto> likedDtoList = new ArrayList<>();
 
-        for (PostLike postLike : postLikeList) {
-            postList.add(postMapper.toDto(postLike.getPost()));
-            postIds.add(postLike.getPost().getId());
+        if (!postLikeList.isEmpty()) {
+            for (PostDto postList : postLists) {
+                for (PostLike postLike : postLikeList) {
+                    if (postList.getId() == postLike.getPost().getId()) {
+                        likedDtoList.add(postMapper.toPostLikedDto(postList, true));
+                    } else {
+                        likedDtoList.add(postMapper.toPostLikedDto(postList, false));
+                    }
+                }
+            }
+        } else {
+            return postMapper.toPostDtoListFalse(postLists);
         }
-
-        return postList;
+        return likedDtoList;
     }
 
     @Override
