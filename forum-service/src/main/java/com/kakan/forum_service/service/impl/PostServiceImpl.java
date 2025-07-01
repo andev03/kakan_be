@@ -53,29 +53,29 @@ public class PostServiceImpl implements PostService {
 
         List<PostLike> postLikeList = postLikeRepository.findByAccountId(accountId);
 
-        List<PostDto> postList = postMapper.toDtoList(postRepository.findAll());
+        if (postLikeList.isEmpty()) {
+            return postMapper.toPostDtoListFalse(postRepository.findAll());
+        }
 
-        return getPostFromPostLike(postLikeList, postList);
+        List<UUID> postLikedIds = getPostLikedIds(postLikeList);
+
+        List<Post> postDtoList = postRepository.findByIdNotIn(postLikedIds);
+
+        List<PostLikedDto> postLikedDto = new ArrayList<>(postMapper.toPostDtoListFalse(postDtoList));
+
+        postDtoList = postRepository.findAllById(postLikedIds);
+
+        postLikedDto.addAll(postMapper.toPostLikedDtoListTrue(postDtoList));
+
+        return postLikedDto;
     }
 
-    private List<PostLikedDto> getPostFromPostLike(List<PostLike> postLikeList, List<PostDto> postLists) {
-
-        List<PostLikedDto> likedDtoList = new ArrayList<>();
-
-        if (!postLikeList.isEmpty()) {
-            for (PostDto postList : postLists) {
-                for (PostLike postLike : postLikeList) {
-                    if (postList.getId() == postLike.getPost().getId()) {
-                        likedDtoList.add(postMapper.toPostLikedDto(postList, true));
-                    } else {
-                        likedDtoList.add(postMapper.toPostLikedDto(postList, false));
-                    }
-                }
-            }
-        } else {
-            return postMapper.toPostDtoListFalse(postLists);
+    private List<UUID> getPostLikedIds(List<PostLike> postLikeList) {
+        List<UUID> postLikedIds = new ArrayList<>();
+        for (PostLike postLike : postLikeList) {
+            postLikedIds.add(postLike.getPost().getId());
         }
-        return likedDtoList;
+        return postLikedIds;
     }
 
     @Override

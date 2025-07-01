@@ -22,17 +22,17 @@ public interface PostMapper {
     List<PostDto> toDtoList(List<Post> posts);
 
     @Mapping(target = "liked", expression = "java(liked)")
-    PostLikedDto toPostLikedDto(PostDto postDto, boolean liked);
+    PostLikedDto toPostLikedDto(Post post, boolean liked);
 
-    default List<PostLikedDto> toPostLikedDtoListTrue(List<PostDto> postDtoList) {
-        return postDtoList.stream()
-                .map(dto -> toPostLikedDto(dto, true))
+    default List<PostLikedDto> toPostLikedDtoListTrue(List<Post> postList) {
+        return postList.stream()
+                .map(post -> toPostLikedDto(post, true))
                 .collect(Collectors.toList());
     }
 
-    default List<PostLikedDto> toPostDtoListFalse(List<PostDto> postDtoList) {
-        return postDtoList.stream()
-                .map(dto -> toPostLikedDto(dto, false))
+    default List<PostLikedDto> toPostDtoListFalse(List<Post> postList) {
+        return postList.stream()
+                .map(post -> toPostLikedDto(post, false))
                 .collect(Collectors.toList());
     }
 
