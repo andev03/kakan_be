@@ -1,18 +1,10 @@
 package com.kakan.user_service.service.impl;
 
-import com.google.protobuf.Timestamp;
-import com.google.protobuf.util.Timestamps;
 import com.google.type.DateTime;
-import com.kakan.account.grpc.UserIdListRequest;
-import com.kakan.account.grpc.UserListResponse;
-import com.kakan.account.grpc.UserResponse;
-import com.kakan.account.grpc.UserServiceGrpc;
+import com.kakan.account.grpc.*;
 import com.kakan.user_service.dto.UserInformationGrpcDto;
 import com.kakan.user_service.dto.request.LoginRequest;
-import com.kakan.user_service.dto.response.AccountDto;
 import com.kakan.user_service.dto.response.AccountResponse;
-import com.kakan.user_service.dto.response.UserInformationDto;
-import com.kakan.user_service.mapper.AccountMapper;
 import com.kakan.user_service.mapper.UserInformationMapper;
 import com.kakan.user_service.model.UserPrincipal;
 import com.kakan.user_service.pojo.Account;
@@ -132,6 +124,39 @@ public class AccountServiceImpl extends UserServiceGrpc.UserServiceImplBase impl
                         .build();
                 responseBuilder.addUsers(userResponse);
             }
+
+            responseObserver.onNext(responseBuilder.build());
+            responseObserver.onCompleted();
+
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL
+                    .withDescription("Server error: " + e.getMessage())
+                    .withCause(e)
+                    .asRuntimeException());
+        }
+    }
+
+    @Override
+    public void getUserById(UserIdRequest request, StreamObserver<UserResponse> responseObserver) {
+        try {
+            Integer id = request.getUserIds();
+            UserInformationGrpcDto user = userInformationMapper.toGrpcDto(userInformationRepository.findById(id).orElse(null));
+
+            DateTime dob = DateTime.newBuilder()
+                    .setYear(user.getDob().getYear())
+                    .setMonth(user.getDob().getMonthValue())
+                    .setDay(user.getDob().getDayOfMonth())
+                    .build();
+
+            UserResponse.Builder responseBuilder = UserResponse.newBuilder(UserResponse.newBuilder()
+                    .setId(user.getUserId())
+                    .setFullName(user.getFullName())
+                    .setGender(user.getGender())
+                    .setDob(dob)
+                    .setPhone(user.getPhone())
+                    .setAddress(user.getAddress())
+                    .setAvatarUrl(Optional.ofNullable(user.getAvatarUrl()).orElse(""))
+                    .build());
 
             responseObserver.onNext(responseBuilder.build());
             responseObserver.onCompleted();
