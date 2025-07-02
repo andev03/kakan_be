@@ -26,6 +26,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,23 +104,27 @@ public class AccountServiceImpl extends UserServiceGrpc.UserServiceImplBase impl
     public void getUsersByIds(UserIdListRequest request, StreamObserver<UserListResponse> responseObserver) {
         try {
             List<Integer> ids = request.getUserIdsList();
+
             List<UserInformationGrpcDto> users = userInformationMapper.toGrpcDtoList(userInformationRepository.findAllByAccountIdIn(ids));
 
             UserListResponse.Builder responseBuilder = UserListResponse.newBuilder();
 
             for (UserInformationGrpcDto user : users) {
-                DateTime dob = DateTime.newBuilder()
-                        .setYear(user.getDob().getYear())
-                        .setMonth(user.getDob().getMonthValue())
-                        .setDay(user.getDob().getDayOfMonth())
-                        .build();
+                LocalDate dobDate = user.getDob();
+
+                DateTime dob = dobDate != null ? DateTime.newBuilder()
+                        .setYear(dobDate.getYear())
+                        .setMonth(dobDate.getMonthValue())
+                        .setDay(dobDate.getDayOfMonth())
+                        .build() : DateTime.getDefaultInstance();
+
                 UserResponse userResponse = UserResponse.newBuilder()
-                        .setId(user.getUserId())
+                        .setId(user.getAccountId())
                         .setFullName(user.getFullName())
-                        .setGender(user.getGender())
+                        .setGender(Optional.ofNullable(user.getGender()).orElse(false))
                         .setDob(dob)
-                        .setPhone(user.getPhone())
-                        .setAddress(user.getAddress())
+                        .setPhone(Optional.ofNullable(user.getPhone()).orElse(""))
+                        .setAddress(Optional.ofNullable(user.getAddress()).orElse(""))
                         .setAvatarUrl(Optional.ofNullable(user.getAvatarUrl()).orElse(""))
                         .build();
                 responseBuilder.addUsers(userResponse);
@@ -149,7 +154,7 @@ public class AccountServiceImpl extends UserServiceGrpc.UserServiceImplBase impl
                     .build();
 
             UserResponse.Builder responseBuilder = UserResponse.newBuilder(UserResponse.newBuilder()
-                    .setId(user.getUserId())
+                    .setId(user.getAccountId())
                     .setFullName(user.getFullName())
                     .setGender(user.getGender())
                     .setDob(dob)

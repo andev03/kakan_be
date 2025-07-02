@@ -2,14 +2,12 @@ package com.kakan.forum_service.service.impl;
 
 import com.kakan.account.grpc.*;
 import com.kakan.forum_service.dto.UserInformationDto;
-import com.kakan.forum_service.service.CommentService;
 import com.kakan.forum_service.service.CommonService;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
