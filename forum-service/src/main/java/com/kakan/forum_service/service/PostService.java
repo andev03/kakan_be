@@ -25,7 +25,7 @@ public interface PostService {
 
     PostDto deletePostByPostId(UUID postId);
 
-    PostDto viewPostByPostId(UUID postId);
+    PostLikedDto viewPostByPostId(UUID postId, Integer accountId);
 
     List<String> viewUserNameLiked(UUID postId);
 

@@ -193,11 +193,21 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto viewPostByPostId(UUID postId) {
+    public PostLikedDto viewPostByPostId(UUID postId, Integer accountId) {
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
-        return postMapper.toDto(post);
+        PostLike postLike = postLikeRepository.findById(
+                PostLikeId.builder()
+                        .post(post)
+                        .accountId(accountId)
+                        .build()
+        ).orElse(null);
+
+        if (postLike == null) {
+            return postMapper.toPostLikedDto(post, false);
+        }
+        return postMapper.toPostLikedDto(post, true);
     }
 
     @Override
