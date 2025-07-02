@@ -76,9 +76,7 @@ public class CommentServiceImpl implements CommentService {
     private List<Integer> getAccountIdsFromComments(List<Comment> comments) {
         List<Integer> accountIds = new ArrayList<>();
         for (Comment comment : comments) {
-            if (!accountIds.contains(comment.getAccountId())) {
-                accountIds.add(comment.getAccountId());
-            }
+            accountIds.add(comment.getAccountId());
         }
         return accountIds;
     }

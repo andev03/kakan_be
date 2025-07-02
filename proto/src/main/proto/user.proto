@@ -27,8 +27,7 @@ message UserResponse {
     string phone = 5;
     string address = 6;
     string avatarUrl = 7;
-    double gpa = 8;
-    string email = 9;
+    string email = 8;
 }
 
 message UserListResponse {
