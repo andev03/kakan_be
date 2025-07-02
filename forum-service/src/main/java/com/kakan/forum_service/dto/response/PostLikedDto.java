@@ -1,5 +1,6 @@
 package com.kakan.forum_service.dto.response;
 
+import com.kakan.forum_service.dto.UserInformationDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,4 +30,6 @@ public class PostLikedDto {
     List<String> topicName;
 
     boolean liked;
+
+    UserInformationDto userInformationDto;
 }
