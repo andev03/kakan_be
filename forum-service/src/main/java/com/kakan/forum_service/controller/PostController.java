@@ -109,12 +109,12 @@ public class PostController {
                 .build();
     }
 
-    @GetMapping("/post/{postId}")
-    public ResponseDto<Object> viewPostByPostId(@PathVariable UUID postId) {
+    @GetMapping("/post/{postId}/{accountId}")
+    public ResponseDto<Object> viewPostByPostId(@PathVariable UUID postId, @PathVariable Integer accountId) {
         return ResponseDto.builder()
                 .status(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
-                .data(postService.viewPostByPostId(postId))
+                .data(postService.viewPostByPostId(postId, accountId))
                 .build();
     }
 
