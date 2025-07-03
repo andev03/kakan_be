@@ -147,23 +147,25 @@ public class AccountServiceImpl extends UserServiceGrpc.UserServiceImplBase impl
             Integer id = request.getUserIds();
             UserInformationGrpcDto user = userInformationMapper.toGrpcDto(userInformationRepository.findById(id).orElse(null));
 
-            DateTime dob = DateTime.newBuilder()
-                    .setYear(user.getDob().getYear())
-                    .setMonth(user.getDob().getMonthValue())
-                    .setDay(user.getDob().getDayOfMonth())
-                    .build();
+            LocalDate dobDate = user.getDob();
 
-            UserResponse.Builder responseBuilder = UserResponse.newBuilder(UserResponse.newBuilder()
+            DateTime dob = dobDate != null ? DateTime.newBuilder()
+                    .setYear(dobDate.getYear())
+                    .setMonth(dobDate.getMonthValue())
+                    .setDay(dobDate.getDayOfMonth())
+                    .build() : DateTime.getDefaultInstance();
+
+            UserResponse userResponse = UserResponse.newBuilder()
                     .setId(user.getAccountId())
                     .setFullName(user.getFullName())
-                    .setGender(user.getGender())
+                    .setGender(Optional.ofNullable(user.getGender()).orElse(false))
                     .setDob(dob)
-                    .setPhone(user.getPhone())
-                    .setAddress(user.getAddress())
+                    .setPhone(Optional.ofNullable(user.getPhone()).orElse(""))
+                    .setAddress(Optional.ofNullable(user.getAddress()).orElse(""))
                     .setAvatarUrl(Optional.ofNullable(user.getAvatarUrl()).orElse(""))
-                    .build());
+                    .build();
 
-            responseObserver.onNext(responseBuilder.build());
+            responseObserver.onNext(userResponse);
             responseObserver.onCompleted();
 
         } catch (Exception e) {
