@@ -1,7 +1,7 @@
 name: Deploy Microservices with Docker Compose
 
 on:
-  pull_request:
+  push:
     branches: [ "release" ]
 
 jobs:
@@ -69,3 +69,74 @@ jobs:
             cd /home/kakan/microservices
             docker compose -f docker-compose.deploy.yml pull
             docker compose -f docker-compose.deploy.yml up -d --remove-orphans
+
+      - name: Notify Slack on Success
+        if: success()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": ":rocket: *Deployment Successful!*",
+              "attachments": [
+                {
+                  "color": "good",
+                  "fields": [
+                    {
+                      "title": "Repository",
+                      "value": "${{ github.repository }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Branch",
+                      "value": "${{ github.ref_name }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Tag",
+                      "value": "${{ env.TAG }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Triggered by",
+                      "value": "${{ github.actor }}",
+                      "short": true
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": ":x: *Deployment Failed!*",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "fields": [
+                    {
+                      "title": "Repository",
+                      "value": "${{ github.repository }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Branch",
+                      "value": "${{ github.ref_name }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Triggered by",
+                      "value": "${{ github.actor }}",
+                      "short": true
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
