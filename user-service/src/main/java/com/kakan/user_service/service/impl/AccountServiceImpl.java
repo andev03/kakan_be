@@ -145,7 +145,8 @@ public class AccountServiceImpl extends UserServiceGrpc.UserServiceImplBase impl
     public void getUserById(UserIdRequest request, StreamObserver<UserResponse> responseObserver) {
         try {
             Integer id = request.getUserIds();
-            UserInformationGrpcDto user = userInformationMapper.toGrpcDto(userInformationRepository.findById(id).orElse(null));
+
+            UserInformationGrpcDto user = userInformationMapper.toGrpcDto(userInformationRepository.findByAccountId(id));
 
             LocalDate dobDate = user.getDob();
 
