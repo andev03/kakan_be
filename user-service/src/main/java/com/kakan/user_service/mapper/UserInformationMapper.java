@@ -13,6 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserInformationMapper {
 
+    @Mapping(source = "account.id", target = "accountId")
     UserInformationGrpcDto toGrpcDto(UserInformation userInformation);
 
     List<UserInformationGrpcDto> toGrpcDtoList(List<UserInformation> userInformationList);

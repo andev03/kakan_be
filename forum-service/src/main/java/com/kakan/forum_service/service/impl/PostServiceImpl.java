@@ -5,6 +5,7 @@ import com.kakan.account.grpc.UserListResponse;
 import com.kakan.account.grpc.UserResponse;
 import com.kakan.account.grpc.UserServiceGrpc;
 import com.kakan.forum_service.dto.PostDto;
+import com.kakan.forum_service.dto.UserInformationDto;
 import com.kakan.forum_service.dto.request.CreatePostRequestDto;
 import com.kakan.forum_service.dto.response.PostLikedDto;
 import com.kakan.forum_service.enums.PostStatus;
@@ -13,6 +14,8 @@ import com.kakan.forum_service.exception.ReportNotFoundException;
 import com.kakan.forum_service.mapper.PostMapper;
 import com.kakan.forum_service.pojo.*;
 import com.kakan.forum_service.repository.*;
+import com.kakan.forum_service.service.CommentService;
+import com.kakan.forum_service.service.CommonService;
 import com.kakan.forum_service.service.PostService;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -44,8 +47,7 @@ public class PostServiceImpl implements PostService {
 
     final PostLikeRepository postLikeRepository;
 
-    @Value("${grpc.host}")
-    String host;
+    final CommonService commonService;
 
     @Override
     public List<PostDto> viewAllPostAdmin() {
@@ -57,29 +59,29 @@ public class PostServiceImpl implements PostService {
 
         List<PostLike> postLikeList = postLikeRepository.findByAccountId(accountId);
 
-        List<PostDto> postList = postMapper.toDtoList(postRepository.findAll());
+        if (postLikeList.isEmpty()) {
+            return postMapper.toPostDtoListFalse(postRepository.findAll());
+        }
 
-        return getPostFromPostLike(postLikeList, postList);
+        List<UUID> postLikedIds = getPostLikedIds(postLikeList);
+
+        List<Post> postDtoList = postRepository.findByIdNotIn(postLikedIds);
+
+        List<PostLikedDto> postLikedDto = new ArrayList<>(postMapper.toPostDtoListFalse(postDtoList));
+
+        postDtoList = postRepository.findAllById(postLikedIds);
+
+        postLikedDto.addAll(postMapper.toPostLikedDtoListTrue(postDtoList));
+
+        return postLikedDto;
     }
 
-    private List<PostLikedDto> getPostFromPostLike(List<PostLike> postLikeList, List<PostDto> postLists) {
-
-        List<PostLikedDto> likedDtoList = new ArrayList<>();
-
-        if (!postLikeList.isEmpty()) {
-            for (PostDto postList : postLists) {
-                for (PostLike postLike : postLikeList) {
-                    if (postList.getId() == postLike.getPost().getId()) {
-                        likedDtoList.add(postMapper.toPostLikedDto(postList, true));
-                    } else {
-                        likedDtoList.add(postMapper.toPostLikedDto(postList, false));
-                    }
-                }
-            }
-        } else {
-            return postMapper.toPostDtoListFalse(postLists);
+    private List<UUID> getPostLikedIds(List<PostLike> postLikeList) {
+        List<UUID> postLikedIds = new ArrayList<>();
+        for (PostLike postLike : postLikeList) {
+            postLikedIds.add(postLike.getPost().getId());
         }
-        return likedDtoList;
+        return postLikedIds;
     }
 
     @Override
@@ -197,11 +199,26 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto viewPostByPostId(UUID postId) {
+    public PostLikedDto viewPostByPostId(UUID postId, Integer accountId) {
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
-        return postMapper.toDto(post);
+        PostLike postLike = postLikeRepository.findById(
+                PostLikeId.builder()
+                        .post(post)
+                        .accountId(accountId)
+                        .build()
+        ).orElse(null);
+
+        boolean isLiked = postLike != null;
+
+        PostLikedDto postLikedDto = postMapper.toPostLikedDto(post, isLiked);
+
+        UserInformationDto userInfo = commonService.getAccountByAccountIdFromAccountService(post.getAccountId());
+
+        postLikedDto.setUserInformationDto(userInfo);
+
+        return postLikedDto;
     }
 
     @Override
@@ -213,7 +230,7 @@ public class PostServiceImpl implements PostService {
         for (PostLike postLike : postLikes) {
             accountIds.add(postLike.getAccountId());
         }
-        return getAccountNameFromAccountService(accountIds);
+        return commonService.getAccountNameFromAccountService(accountIds);
     }
 
     @Override
@@ -232,23 +249,5 @@ public class PostServiceImpl implements PostService {
         }
 
         return postList;
-    }
-
-    private List<String> getAccountNameFromAccountService(List<Integer> accountIds) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress(host, 9090)
-                .usePlaintext()
-                .build();
-
-        try {
-            UserServiceGrpc.UserServiceBlockingStub stub = UserServiceGrpc.newBlockingStub(channel);
-            UserIdListRequest request = UserIdListRequest.newBuilder().addAllUserIds(accountIds).build();
-            UserListResponse response = stub.getUsersByIds(request);
-
-            return response.getUsersList().stream()
-                    .map(UserResponse::getFullName)
-                    .toList();
-        } finally {
-            channel.shutdown();
-        }
     }
 }

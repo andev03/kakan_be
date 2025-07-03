@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class UserInformationDto {
-    private Integer userId;
+    private Integer accountId;
 
     private String fullName;
 

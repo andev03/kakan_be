@@ -12,6 +12,8 @@ import java.time.LocalDate;
 public class UserInformationGrpcDto {
     private Integer userId;
 
+    private Integer accountId;
+
     private String fullName;
 
     private Boolean gender;
