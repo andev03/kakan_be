@@ -69,6 +69,7 @@ jobs:
             cd /home/kakan/microservices
             docker compose -f docker-compose.deploy.yml pull
             docker compose -f docker-compose.deploy.yml up -d --remove-orphans
+            docker image prune -af
 
       - name: Notify Slack on Success
         if: success()
@@ -76,7 +77,7 @@ jobs:
         with:
           payload: |
             {
-              "text": ":rocket: *Deployment tag: *\n${{ env.TAG }} Successful!*"
+              "text": ":rocket: Deployment tag: ${{ env.TAG }} Successful!"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -87,7 +88,7 @@ jobs:
         with:
           payload: |
             {
-              "text": ":rocket: *Deployment tag: *\n${{ env.TAG }} Failed!*"
+              "text": ":boom: Deployment tag: ${{ env.TAG }} Failed!"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
