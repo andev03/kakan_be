@@ -47,16 +47,21 @@ public class UserInformationServiceImpl implements UserInformationService {
         try{
             Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             UserInformation userInformation = userInformationRepository.findByAccountId(account.getId());
+            if (request.getPhone() != null) {
 
-            if (request.getPhone().equals(userInformation.getPhone()) || !userInformationRepository.existsByPhone(request.getPhone())) {
-                userInformation.setPhone(request.getPhone());
-            } else {
-                throw new DuplicateEntity("Số điện thoại đã được sử dụng.");
+                if (!request.getPhone().equals(userInformation.getPhone()) && userInformationRepository.existsByPhone(request.getPhone())) {
+                    throw new DuplicateEntity("Số điện thoại đã được sử dụng.");
+                }
+                // Nếu số điện thoại mới khác số điện thoại cũ (và không trùng lặp)
+                if (!request.getPhone().equals(userInformation.getPhone())) {
+                    userInformation.setPhone(request.getPhone());
+                }
             }
-            if (!Objects.equals(request.getFullName(), userInformation.getFullName())) {
+
+            if (request.getFullName() != null && !Objects.equals(request.getFullName(), userInformation.getFullName())) {
                 userInformation.setFullName(request.getFullName());
             }
-            if (!Objects.equals(request.getAddress(), userInformation.getAddress())) {
+            if (request.getAddress() != null && !Objects.equals(request.getAddress(), userInformation.getAddress())) {
                 userInformation.setAddress(request.getAddress());
             }
             // Xử lý upload ảnh nếu có
