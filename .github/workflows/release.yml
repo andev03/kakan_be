@@ -76,36 +76,7 @@ jobs:
         with:
           payload: |
             {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": ":rocket: *Deployment Successful!*"
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Repository:*\n${{ github.repository }}"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Branch:*\n${{ github.ref_name }}"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Version Tag:*\n${{ env.TAG }}"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*By:*\n${{ github.actor }}"
-                    }
-                  ]
-                }
-              ]
+              "text": ":rocket: *Deployment tag: *\n${{ env.TAG }} Successful!*"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -116,45 +87,7 @@ jobs:
         with:
           payload: |
             {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": ":x: *Deployment Failed!*"
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Repository:*\n${{ github.repository }}"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Branch:*\n${{ github.ref_name }}"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Version Tag:*\n${{ env.TAG }}"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*By:*\n${{ github.actor }}"
-                    }
-                  ]
-                },
-                {
-                  "type": "context",
-                  "elements": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "🔗 <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Actions Run>"
-                    }
-                  ]
-                }
-              ]
+              "text": ":rocket: *Deployment tag: *\n${{ env.TAG }} Failed!*"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
