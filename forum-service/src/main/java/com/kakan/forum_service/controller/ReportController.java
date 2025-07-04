@@ -31,7 +31,6 @@ public class ReportController {
                 .build();
     }
 
-
     @GetMapping("/reports/{postId}")
     public ResponseDto<Object> viewReportByPostId(@PathVariable UUID postId) {
         return ResponseDto.builder()

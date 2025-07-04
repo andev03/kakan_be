@@ -2,6 +2,7 @@ package com.kakan.forum_service.service.impl;
 
 import com.kakan.forum_service.dto.ReportDto;
 import com.kakan.forum_service.dto.request.CreateReportRequestDto;
+import com.kakan.forum_service.enums.PostStatus;
 import com.kakan.forum_service.exception.PostNotFoundException;
 import com.kakan.forum_service.mapper.ReportMapper;
 import com.kakan.forum_service.pojo.Post;
@@ -34,6 +35,8 @@ public class ReportServiceImpl implements ReportService {
     public ReportDto createReport(UUID postId, CreateReportRequestDto createReportRequestDto) {
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+
+        post.setStatus(PostStatus.REPORTING.name());
 
         Report report = reportRepository.save(
                 Report.builder()
