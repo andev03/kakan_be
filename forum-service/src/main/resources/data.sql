@@ -1,12 +1,35 @@
--- Insert 2 post có ID cố định
-INSERT INTO post (id, user_id, content, like_count, comment_count)
+INSERT INTO topic (name)
 VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Hello world! Đây là bài đăng đầu tiên.', 5, 2),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'Chào mọi người, hôm nay trời đẹp.', 3, 1);
+    ('Introduction'),
+    ('Programming'),
+    ('Technology'),
+    ('Others');
 
--- Insert comment liên kết đúng post_id ở trên
-INSERT INTO comment (id, post_id, user_id, content)
+INSERT INTO post (id, account_id, title, content, like_count, status)
 VALUES
-  (gen_random_uuid(), 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Bình luận đầu tiên cho post 1'),
-  (gen_random_uuid(), 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Bình luận thứ hai cho post 1'),
-  (gen_random_uuid(), 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', 'Bình luận cho post 2');
+    ('00000000-0000-0000-0000-000000000001', 1, 'Welcome Post', 'Hello world from user 1!', 1, 'ACTIVE'),
+    ('00000000-0000-0000-0000-000000000002', 2, 'Spring Boot Tips', 'Spring Boot tips and tricks', 1, 'ACTIVE'),
+    ('00000000-0000-0000-0000-000000000003', 3, 'Kotlin Dilemma', 'Should I learn Kotlin?', 1, 'BLOCKED');
+
+INSERT INTO post_topic (post_id, topic_id)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 1),
+    ('00000000-0000-0000-0000-000000000002', 2),
+    ('00000000-0000-0000-0000-000000000003', 3);
+
+INSERT INTO comment (post_id, account_id, content)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 2, 'Nice post!'),
+    ('00000000-0000-0000-0000-000000000001', 3, 'Agree with you.'),
+    ('00000000-0000-0000-0000-000000000002', 1, 'Thanks for sharing!');
+
+INSERT INTO post_like (post_id, account_id)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 3),
+    ('00000000-0000-0000-0000-000000000002', 1),
+    ('00000000-0000-0000-0000-000000000003', 2);
+
+INSERT INTO report (post_id, reporter_id, reason)
+VALUES
+    ('00000000-0000-0000-0000-000000000003', 1, 'Spam content'),
+    ('00000000-0000-0000-0000-000000000003', 2, 'Offensive language');

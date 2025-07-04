@@ -33,4 +33,12 @@ springdoc:
   swagger-ui:
     disable-swagger-default-url: true
     path: /api
-  show-actuator: true
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/

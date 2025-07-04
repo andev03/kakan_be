@@ -1,0 +1,60 @@
+server:
+  port: 8800
+
+spring:
+  application:
+    name: gatewayserver
+  main:
+    banner-mode: off
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: admission-advisor-service
+              uri: lb://ADMISSION-ADVISOR-SERVICE
+              predicates:
+                - Path=/admission/**
+              filters:
+                - StripPrefix=1
+            - id: user-service
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/user/**
+              filters:
+                - StripPrefix=1
+            - id: school-service
+              uri: lb://SCHOOL-SERVICE
+              predicates:
+                - Path=/school/**
+              filters:
+                - StripPrefix=1
+            - id: forum-service
+              uri: lb://FORUM-SERVICE
+              predicates:
+                - Path=/forum/**
+              filters:
+                - StripPrefix=1
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://localhost:5173"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders:
+                  - "*"
+                allowCredentials: true
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/

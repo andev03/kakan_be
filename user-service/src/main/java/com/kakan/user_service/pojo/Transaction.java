@@ -31,9 +31,9 @@ public class Transaction {
     @Column(name = "transaction_date", nullable = false)
     private OffsetDateTime transactionDate;
 
-    @Enumerated(EnumType.STRING)
+
     @Column(nullable = false, length = 10)
-    private TransactionStatus status;
+    private String status;
 
     @Column(name = "response_message", columnDefinition = "TEXT")
     private String responseMessage;

@@ -21,10 +21,13 @@ public class UserInformation {
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
-    @Column(nullable = false)
+    @Column(name = "full_name", length = 50)
+    private String fullName;
+
+    @Column(nullable = true)
     private Boolean gender;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDate dob;
 
     @Column(length = 20)
@@ -36,4 +39,6 @@ public class UserInformation {
     @Column(name = "avatar_url", columnDefinition = "TEXT")
     private String avatarUrl;
 
+    @Column(name = "gpa")
+    private Double gpa;
 }
