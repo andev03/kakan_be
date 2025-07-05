@@ -32,4 +32,6 @@ public class PostDto {
     LocalDateTime createdAt;
 
     List<String> topicName;
+
+    String accountName;
 }
