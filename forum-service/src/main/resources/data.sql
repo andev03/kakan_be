@@ -5,21 +5,17 @@ VALUES
     ('Technology'),
     ('Others');
 
-INSERT INTO post (id, account_id, title, content, like_count, status)
+INSERT INTO post (id, account_id, title, content, like_count, comment_count, status)
 VALUES
-    ('00000000-0000-0000-0000-000000000001', 1, 'Welcome Post', 'Hello world from user 1!', 1, 'ACTIVE'),
-    ('00000000-0000-0000-0000-000000000002', 2, 'Spring Boot Tips', 'Spring Boot tips and tricks', 1, 'ACTIVE'),
-    ('00000000-0000-0000-0000-000000000003', 3, 'Kotlin Dilemma', 'Should I learn Kotlin?', 1, 'BLOCKED'),
-    ('00000000-0000-0000-0000-000000000004', 3, 'Kotlin Dilemma', 'Should I learn Kotlin?', 1, 'REPORTING'),
-    ('00000000-0000-0000-0000-000000000005', 3, 'Kotlin Dilemma', 'Should I learn Kotlin?', 1, 'DELETED');
+    ('00000000-0000-0000-0000-000000000001', 1, 'Welcome Post', 'Hello world from user 1!', 1, 2,'ACTIVE'),
+    ('00000000-0000-0000-0000-000000000002', 2, 'Spring Boot Tips', 'Spring Boot tips and tricks', 1, 1, 'ACTIVE'),
+    ('00000000-0000-0000-0000-000000000003', 3, 'Kotlin Dilemma', 'Should I learn Kotlin?', 1, 0, 'BLOCKED');
 
 INSERT INTO post_topic (post_id, topic_id)
 VALUES
     ('00000000-0000-0000-0000-000000000001', 1),
     ('00000000-0000-0000-0000-000000000002', 2),
-    ('00000000-0000-0000-0000-000000000003', 3),
-    ('00000000-0000-0000-0000-000000000004', 3),
-    ('00000000-0000-0000-0000-000000000005', 3);
+    ('00000000-0000-0000-0000-000000000003', 3);
 
 INSERT INTO comment (post_id, account_id, content)
 VALUES
@@ -36,7 +32,4 @@ VALUES
 INSERT INTO report (post_id, reporter_id, reason)
 VALUES
     ('00000000-0000-0000-0000-000000000003', 1, 'Spam content'),
-    ('00000000-0000-0000-0000-000000000003', 2, 'Offensive language'),
-    ('00000000-0000-0000-0000-000000000004', 1, 'Spam content'),
-    ('00000000-0000-0000-0000-000000000004', 2, 'Offensive language'),
-    ('00000000-0000-0000-0000-000000000004', 1, 'Spam content');
+    ('00000000-0000-0000-0000-000000000003', 2, 'Offensive language');

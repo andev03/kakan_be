@@ -44,7 +44,36 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostDto> viewAllPostAdmin() {
-        return postMapper.toDtoList(postRepository.findAll());
+
+        List<Post> postList = postRepository.findAll();
+
+        List<Integer> accountIds = getAccountIds(postList);
+
+        List<UserInformationDto> userInformationDtoList = commonService.getAccountFromAccountService(accountIds);
+
+        return getPostDtoList(postList, userInformationDtoList);
+    }
+
+    private List<PostDto> getPostDtoList(List<Post> postList, List<UserInformationDto> userInformationDtoList) {
+        List<PostDto> result = new ArrayList<>();
+        for (Post post : postList) {
+            for (UserInformationDto userInformationDto : userInformationDtoList) {
+                if (Objects.equals(post.getAccountId(), userInformationDto.getAccountId())) {
+                    PostDto postDto = postMapper.toDto(post);
+                    postDto.setAccountName(userInformationDto.getFullName());
+                    result.add(postDto);
+                }
+            }
+        }
+        return result;
+    }
+
+    private List<Integer> getAccountIds(List<Post> postDtoList) {
+        List<Integer> accountIds = new ArrayList<>();
+        for (Post post : postDtoList) {
+            accountIds.add(post.getAccountId());
+        }
+        return accountIds;
     }
 
     @Override
