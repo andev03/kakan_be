@@ -1,7 +1,6 @@
-target
-**/target
-.git
-.idea
-*.iml
+target/
+node_modules/
 *.log
-*.md
+*.iml
+.idea/
+.mvn/
