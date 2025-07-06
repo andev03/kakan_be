@@ -1,9 +1,5 @@
 package com.kakan.forum_service.service.impl;
 
-import com.kakan.account.grpc.UserIdListRequest;
-import com.kakan.account.grpc.UserListResponse;
-import com.kakan.account.grpc.UserResponse;
-import com.kakan.account.grpc.UserServiceGrpc;
 import com.kakan.forum_service.dto.PostDto;
 import com.kakan.forum_service.dto.UserInformationDto;
 import com.kakan.forum_service.dto.request.CreatePostRequestDto;
@@ -14,11 +10,8 @@ import com.kakan.forum_service.exception.ReportNotFoundException;
 import com.kakan.forum_service.mapper.PostMapper;
 import com.kakan.forum_service.pojo.*;
 import com.kakan.forum_service.repository.*;
-import com.kakan.forum_service.service.CommentService;
 import com.kakan.forum_service.service.CommonService;
 import com.kakan.forum_service.service.PostService;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -51,7 +45,36 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostDto> viewAllPostAdmin() {
-        return postMapper.toDtoList(postRepository.findAll());
+
+        List<Post> postList = postRepository.findAll();
+
+        List<Integer> accountIds = getAccountIds(postList);
+
+        List<UserInformationDto> userInformationDtoList = commonService.getAccountFromAccountService(accountIds);
+
+        return getPostDtoList(postList, userInformationDtoList);
+    }
+
+    private List<PostDto> getPostDtoList(List<Post> postList, List<UserInformationDto> userInformationDtoList) {
+        List<PostDto> result = new ArrayList<>();
+        for (Post post : postList) {
+            for (UserInformationDto userInformationDto : userInformationDtoList) {
+                if (Objects.equals(post.getAccountId(), userInformationDto.getAccountId())) {
+                    PostDto postDto = postMapper.toDto(post);
+                    postDto.setAccountName(userInformationDto.getFullName());
+                    result.add(postDto);
+                }
+            }
+        }
+        return result;
+    }
+
+    private List<Integer> getAccountIds(List<Post> postDtoList) {
+        List<Integer> accountIds = new ArrayList<>();
+        for (Post post : postDtoList) {
+            accountIds.add(post.getAccountId());
+        }
+        return accountIds;
     }
 
     @Override
@@ -85,8 +108,30 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> viewPostByAccountId(Integer accountId) {
-        return postMapper.toDtoList(postRepository.findByAccountId(accountId));
+    public List<PostLikedDto> viewPostByAccountId(Integer accountId) {
+        List<PostLike> postLikeList = getPostLikedIdOfAccountId(accountId);
+
+        if (postLikeList.isEmpty()) {
+            return postMapper.toPostDtoListFalse(postRepository.findByAccountId(accountId));
+        }
+
+        List<UUID> postLikedIds = getPostLikedIds(postLikeList);
+
+        List<Post> postDtoList = postRepository.findAllByAccountIdAndIdNotIn(accountId, postLikedIds);
+
+        List<PostLikedDto> postLikedDto = new ArrayList<>(postMapper.toPostDtoListFalse(postDtoList));
+
+        postDtoList = postRepository.findAllByAccountIdAndIdIn(accountId, postLikedIds);
+
+        postLikedDto.addAll(postMapper.toPostLikedDtoListTrue(postDtoList));
+
+        return postLikedDto;
+    }
+
+    private List<PostLike> getPostLikedIdOfAccountId(Integer accountId) {
+        List<PostLike> postLikes = postLikeRepository.findByAccountId(accountId);
+        postLikes.removeIf(postLike -> !Objects.equals(postLike.getPost().getAccountId(), accountId));
+        return postLikes;
     }
 
     @Override

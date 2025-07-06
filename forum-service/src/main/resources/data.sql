@@ -5,11 +5,11 @@ VALUES
     ('Technology'),
     ('Others');
 
-INSERT INTO post (id, account_id, title, content, like_count, status)
+INSERT INTO post (id, account_id, title, content, like_count, comment_count, status)
 VALUES
-    ('00000000-0000-0000-0000-000000000001', 1, 'Welcome Post', 'Hello world from user 1!', 1, 'ACTIVE'),
-    ('00000000-0000-0000-0000-000000000002', 2, 'Spring Boot Tips', 'Spring Boot tips and tricks', 1, 'ACTIVE'),
-    ('00000000-0000-0000-0000-000000000003', 3, 'Kotlin Dilemma', 'Should I learn Kotlin?', 1, 'BLOCKED');
+    ('00000000-0000-0000-0000-000000000001', 1, 'Welcome Post', 'Hello world from user 1!', 1, 2,'ACTIVE'),
+    ('00000000-0000-0000-0000-000000000002', 2, 'Spring Boot Tips', 'Spring Boot tips and tricks', 1, 1, 'ACTIVE'),
+    ('00000000-0000-0000-0000-000000000003', 3, 'Kotlin Dilemma', 'Should I learn Kotlin?', 1, 0, 'BLOCKED');
 
 INSERT INTO post_topic (post_id, topic_id)
 VALUES

@@ -11,4 +11,8 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     List<Post> findByAccountId(Integer accountId);
 
     List<Post> findByIdNotIn(List<UUID> postId);
+
+    List<Post> findAllByAccountIdAndIdIn(Integer accountId, List<UUID> postId);
+
+    List<Post> findAllByAccountIdAndIdNotIn(Integer accountId, List<UUID> postId);
 }
