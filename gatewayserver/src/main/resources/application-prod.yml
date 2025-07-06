@@ -37,6 +37,7 @@ spring:
               '[/**]':
                 allowedOrigins:
                   - "http://localhost:5173"
+                  - "https://nguyenhoangan.site"
                 allowedMethods:
                   - GET
                   - POST
