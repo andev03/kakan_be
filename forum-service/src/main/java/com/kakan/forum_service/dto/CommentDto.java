@@ -1,8 +1,6 @@
 package com.kakan.forum_service.dto;
 
-import com.kakan.forum_service.pojo.Post;
-import jakarta.persistence.*;
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,11 +9,14 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommentDto {
 
     UUID id;
 
     Integer accountId;
+
+    String accountName;
 
     String content;
 

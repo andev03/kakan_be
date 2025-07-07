@@ -1,18 +1,10 @@
 package com.kakan.user_service.service.impl;
 
-import com.google.protobuf.Timestamp;
-import com.google.protobuf.util.Timestamps;
 import com.google.type.DateTime;
-import com.kakan.account.grpc.UserIdListRequest;
-import com.kakan.account.grpc.UserListResponse;
-import com.kakan.account.grpc.UserResponse;
-import com.kakan.account.grpc.UserServiceGrpc;
+import com.kakan.account.grpc.*;
 import com.kakan.user_service.dto.UserInformationGrpcDto;
 import com.kakan.user_service.dto.request.LoginRequest;
-import com.kakan.user_service.dto.response.AccountDto;
 import com.kakan.user_service.dto.response.AccountResponse;
-import com.kakan.user_service.dto.response.UserInformationDto;
-import com.kakan.user_service.mapper.AccountMapper;
 import com.kakan.user_service.mapper.UserInformationMapper;
 import com.kakan.user_service.model.UserPrincipal;
 import com.kakan.user_service.pojo.Account;
@@ -34,6 +26,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,29 +104,69 @@ public class AccountServiceImpl extends UserServiceGrpc.UserServiceImplBase impl
     public void getUsersByIds(UserIdListRequest request, StreamObserver<UserListResponse> responseObserver) {
         try {
             List<Integer> ids = request.getUserIdsList();
+
             List<UserInformationGrpcDto> users = userInformationMapper.toGrpcDtoList(userInformationRepository.findAllByAccountIdIn(ids));
 
             UserListResponse.Builder responseBuilder = UserListResponse.newBuilder();
 
             for (UserInformationGrpcDto user : users) {
-                DateTime dob = DateTime.newBuilder()
-                        .setYear(user.getDob().getYear())
-                        .setMonth(user.getDob().getMonthValue())
-                        .setDay(user.getDob().getDayOfMonth())
-                        .build();
+                LocalDate dobDate = user.getDob();
+
+                DateTime dob = dobDate != null ? DateTime.newBuilder()
+                        .setYear(dobDate.getYear())
+                        .setMonth(dobDate.getMonthValue())
+                        .setDay(dobDate.getDayOfMonth())
+                        .build() : DateTime.getDefaultInstance();
+
                 UserResponse userResponse = UserResponse.newBuilder()
-                        .setId(user.getUserId())
+                        .setId(user.getAccountId())
                         .setFullName(user.getFullName())
-                        .setGender(user.getGender())
+                        .setGender(Optional.ofNullable(user.getGender()).orElse(false))
                         .setDob(dob)
-                        .setPhone(user.getPhone())
-                        .setAddress(user.getAddress())
+                        .setPhone(Optional.ofNullable(user.getPhone()).orElse(""))
+                        .setAddress(Optional.ofNullable(user.getAddress()).orElse(""))
                         .setAvatarUrl(Optional.ofNullable(user.getAvatarUrl()).orElse(""))
                         .build();
                 responseBuilder.addUsers(userResponse);
             }
 
             responseObserver.onNext(responseBuilder.build());
+            responseObserver.onCompleted();
+
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL
+                    .withDescription("Server error: " + e.getMessage())
+                    .withCause(e)
+                    .asRuntimeException());
+        }
+    }
+
+    @Override
+    public void getUserById(UserIdRequest request, StreamObserver<UserResponse> responseObserver) {
+        try {
+            Integer id = request.getUserIds();
+
+            UserInformationGrpcDto user = userInformationMapper.toGrpcDto(userInformationRepository.findByAccountId(id));
+
+            LocalDate dobDate = user.getDob();
+
+            DateTime dob = dobDate != null ? DateTime.newBuilder()
+                    .setYear(dobDate.getYear())
+                    .setMonth(dobDate.getMonthValue())
+                    .setDay(dobDate.getDayOfMonth())
+                    .build() : DateTime.getDefaultInstance();
+
+            UserResponse userResponse = UserResponse.newBuilder()
+                    .setId(user.getAccountId())
+                    .setFullName(user.getFullName())
+                    .setGender(Optional.ofNullable(user.getGender()).orElse(false))
+                    .setDob(dob)
+                    .setPhone(Optional.ofNullable(user.getPhone()).orElse(""))
+                    .setAddress(Optional.ofNullable(user.getAddress()).orElse(""))
+                    .setAvatarUrl(Optional.ofNullable(user.getAvatarUrl()).orElse(""))
+                    .build();
+
+            responseObserver.onNext(userResponse);
             responseObserver.onCompleted();
 
         } catch (Exception e) {

@@ -21,10 +21,6 @@ public class ChatMessage {
     @GeneratedValue
     UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "session_id", nullable = false)
-    ChatSession session;
-
     @Column(name = "sender_type", nullable = false)
     String senderType;
 

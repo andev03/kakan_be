@@ -13,7 +13,7 @@ public interface PostService {
 
     List<PostLikedDto> viewAllPostUser(Integer accountId);
 
-    List<PostDto> viewPostByAccountId(Integer accountId);
+    List<PostLikedDto> viewPostByAccountId(Integer accountId);
 
     PostDto likePostByPostId(UUID postId, Integer accountId);
 
@@ -25,7 +25,7 @@ public interface PostService {
 
     PostDto deletePostByPostId(UUID postId);
 
-    PostDto viewPostByPostId(UUID postId);
+    PostLikedDto viewPostByPostId(UUID postId, Integer accountId);
 
     List<String> viewUserNameLiked(UUID postId);
 
