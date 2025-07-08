@@ -131,7 +131,7 @@ public class VNPayServiceImpl implements VNPayService {
 
         String queryUrl = query.toString();
         String vnp_SecureHash = VNPayConfig.hmacSHA512(secretKey, hashData.toString());
-        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+//        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
         CreatePaymentResponse paymentResponse = new CreatePaymentResponse();
         paymentResponse.setMessage("Tạo URL thanh toán thành công");

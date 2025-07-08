@@ -1,21 +1,22 @@
-DROP TABLE IF EXISTS payment_methods CASCADE;
-DROP TABLE IF EXISTS payments CASCADE;
+-- schema.sql
+-- Drop bảng nếu đã tồn tại để đảm bảo môi trường sạch
+DROP TABLE IF EXISTS payment CASCADE;
 
-CREATE TABLE payment_methods (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL,
-    method_type VARCHAR(20) NOT NULL CHECK (method_type IN ('VNPAY', 'MOMO', 'CARD', 'CASH')),
-    method_token VARCHAR(255),
-    last_used TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- Tạo bảng payment dựa trên POJO của bạn
+CREATE TABLE payment (
+                         payment_id SERIAL PRIMARY KEY, -- SERIAL tự động tăng cho Integer ID (PostgreSQL)
+                         order_id INTEGER NOT NULL,
+                         account_id INTEGER NOT NULL, -- Thêm cột account_id từ POJO
+                         amount DOUBLE PRECISION NOT NULL, -- DOUBLE PRECISION cho Double trong Java
+                         payment_method VARCHAR(100) NOT NULL,
+                         payment_date TIMESTAMP WITH TIME ZONE NOT NULL, -- TIMESTAMP WITH TIME ZONE cho OffsetDateTime
+                         status VARCHAR(10) NOT NULL,
+                         response_message TEXT,
+
+    -- Thêm ràng buộc UNIQUE cho order_id nếu mỗi order chỉ có một payment duy nhất
+                         CONSTRAINT uq_order_id UNIQUE (order_id)
 );
-CREATE TABLE payments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    order_id UUID NOT NULL,
-    payment_method_id UUID NOT NULL REFERENCES payment_methods(id),
-    provider_txn_id VARCHAR(100),
-    amount DECIMAL(12, 2) NOT NULL CHECK (amount >= 0),
-    status VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'SUCCESS', 'FAILED', 'CANCELLED')),
-    paid_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+
+-- Bạn có thể thêm các index nếu cần để tối ưu truy vấn
+-- CREATE INDEX idx_payment_order_id ON payment (order_id);
+-- CREATE INDEX idx_payment_status ON payment (status);
