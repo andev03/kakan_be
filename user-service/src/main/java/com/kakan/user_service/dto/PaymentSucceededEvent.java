@@ -1,4 +1,4 @@
-package com.kakan.payment_service.dto;
+package com.kakan.user_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

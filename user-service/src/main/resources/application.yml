@@ -24,6 +24,18 @@ spring:
                 token-uri: https://oauth2.googleapis.com/token
                 user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
                 user-name-attribute: sub
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    consumer:
+      group-id: user-service
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+      properties:
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: "com.kakan.user_service.dto"
   datasource:
     url: jdbc:postgresql://localhost:5432/user_service_db
     username: postgres
