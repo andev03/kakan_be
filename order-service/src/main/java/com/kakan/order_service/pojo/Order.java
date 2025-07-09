@@ -16,8 +16,8 @@ public class Order {
     @Column(name = "order_id")
     private Integer orderId;
 
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @Column(name = "account_id", nullable = false)
+    private Integer accountId;
 
     @Column(nullable = false)
     private Double price;

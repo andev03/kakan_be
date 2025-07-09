@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS "order" CASCADE;
 
 CREATE TABLE "order" (
     order_id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    account_id INTEGER NOT NULL,
     price DECIMAL(12,2) NOT NULL CHECK (price >= 0),
     status VARCHAR(20) NOT NULL CHECK (status IN ('PENDING','ACTIVE','EXPIRED','CANCELLED')),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

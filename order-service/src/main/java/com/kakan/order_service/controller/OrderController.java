@@ -14,10 +14,10 @@ public class OrderController {
 
     @Autowired
     OrderService orderService;
-    @PostMapping("/create/{userId}")
-    public ResponseDto<Order> createOrder(@RequestParam int userId) {
+    @PostMapping("/create/{accountId}")
+    public ResponseDto<Order> createOrder(@PathVariable int accountId) {
         try{
-           Order order = orderService.createOrder(userId);
+           Order order = orderService.createOrder(accountId);
            return new ResponseDto<>(200, "Order created successfully", order);
         } catch (Exception e) {
             throw new RuntimeException(e);

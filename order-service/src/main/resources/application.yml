@@ -2,7 +2,7 @@ server:
   port: 8004
 spring:
   application:
-    name: admission-advisor-service
+    name: order-service
   datasource:
     url: jdbc:postgresql://localhost:5432/order_service_db
     username: postgres
@@ -21,22 +21,33 @@ spring:
       mode: always
   kafka:
     bootstrap-servers: localhost:9092
+
+    # producer (Order phát OrderCreatedEvent)
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.add.type.headers: false
+
+    # consumer (Order lắng nghe payment.*
     consumer:
       group-id: order-service
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      auto-commit-interval: 1000
       properties:
         spring.json.use.type.headers: false
-        spring.json.trusted.packages: "com.kakan.order_service.dto"
+        spring.json.trusted.packages: "com.kakan.*.dto"
 
 
 logging:
   level:
+    org.springframework.kafka: DEBUG
+    org.apache.kafka.clients.producer.KafkaProducer: TRACE
+    org.springframework.kafka.listener: DEBUG
+    org.apache.kafka.clients.consumer: TRACE
     root: warn
     org:
       hibernate:

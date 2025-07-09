@@ -1,6 +1,8 @@
 package com.kakan.payment_service.service.impl;
 
 import com.kakan.payment_service.config.VNPayConfig;
+import com.kakan.payment_service.dto.PaymentFailedEvent;
+import com.kakan.payment_service.dto.PaymentSucceededEvent;
 import com.kakan.payment_service.dto.request.CreatePaymentRequest;
 import com.kakan.payment_service.dto.response.CreatePaymentResponse;
 import com.kakan.payment_service.dto.response.PaymentResponse;
@@ -9,7 +11,10 @@ import com.kakan.payment_service.pojo.Payment;
 import com.kakan.payment_service.repository.PaymentRepository;
 import com.kakan.payment_service.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -19,14 +24,22 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static com.kakan.payment_service.config.VNPayConfig.secretKey;
 
+@Slf4j
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    private final KafkaTemplate<String,Object> kafkaTemplate;
+
+    public PaymentServiceImpl(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
 
     @Override
@@ -170,16 +183,64 @@ public class PaymentServiceImpl implements PaymentService {
 //                    order.setExpiredDate(OffsetDateTime.now().plusDays(30)); // Đặt ngày hết hạn là 30 ngày kể từ khi thanh toán thành công
                     payment.setStatus(PaymentEnums.SUCCESS.name());
                     payment.setResponseMessage("Thanh toán thành công");
+                    
+                    PaymentSucceededEvent successEvent = new PaymentSucceededEvent(
+                            payment.getOrderId(),
+                            payment.getAccountId(),
+                            payment.getPaymentId()
+                    );
+                    
+                    log.info("Sending PaymentSucceededEvent for orderId: {}, accountId: {}, paymentId: {}",
+                            payment.getOrderId(), payment.getAccountId(), payment.getPaymentId());
+                    
+                    try {
+                        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send("payment.succeeded", successEvent);
+                        future.whenComplete((result, ex) -> {
+                            if (ex == null) {
+                                log.info("Successfully sent PaymentSucceededEvent for orderId: {} with offset: {}",
+                                        payment.getOrderId(), result.getRecordMetadata().offset());
+                            } else {
+                                log.error("Failed to send PaymentSucceededEvent for orderId: {}: {}", 
+                                        payment.getOrderId(), ex.getMessage(), ex);
+                            }
+                        });
+                    } catch (Exception e) {
+                        log.error("Error sending PaymentSucceededEvent for orderId: {}: {}", payment.getOrderId(), e.getMessage(), e);
+                        throw e;
+                    }
                 } else {
                     // Giao dịch thất bại
 //                    order.setStatus(OrderStatus.CANCELLED.name());
 //                    order.setNote("Thanh toán thất bại.");
                     payment.setStatus(PaymentEnums.FAILED.name());
                     payment.setResponseMessage("Thanh toán thất bại. Mã lỗi VNPAY: " + vnp_ResponseCode + ", Trạng thái: " + vnp_TransactionStatus);
+                    
+                    PaymentFailedEvent failedEvent = new PaymentFailedEvent(
+                            payment.getOrderId(),
+                            payment.getResponseMessage()
+                    );
+                    
+                    log.info("Sending PaymentFailedEvent for orderId: {}, reason: {}",
+                            payment.getOrderId(), payment.getResponseMessage());
+                    
+                    try {
+                        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send("payment.failed", failedEvent);
+                        future.whenComplete((result, ex) -> {
+                            if (ex == null) {
+                                log.info("Successfully sent PaymentFailedEvent for orderId: {} with offset: {}",
+                                        payment.getOrderId(), result.getRecordMetadata().offset());
+                            } else {
+                                log.error("Failed to send PaymentFailedEvent for orderId: {}: {}", 
+                                        payment.getOrderId(), ex.getMessage(), ex);
+                            }
+                        });
+                    } catch (Exception e) {
+                        log.error("Error sending PaymentFailedEvent for orderId: {}: {}", payment.getOrderId(), e.getMessage(), e);
+                        throw e;
+                    }
                 }
 //                orderRepository.save(order);
                 paymentRepository.save(payment);
-
                 return PaymentResponse.builder()
                         .code(vnp_ResponseCode)
                         .message(payment.getResponseMessage())

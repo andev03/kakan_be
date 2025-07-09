@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PaymentSucceededEvent {
     private Integer orderId;
-    private Integer userId;
-    private String transactionId;
+    private Integer accountID;
+    private Integer paymentId;
     // constructors, getters/setters
 }
