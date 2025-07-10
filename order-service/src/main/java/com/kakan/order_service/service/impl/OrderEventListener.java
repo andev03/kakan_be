@@ -1,13 +1,14 @@
 package com.kakan.order_service.service.impl;
 
-import com.kakan.order_service.dto.PaymentFailedEvent;
-import com.kakan.order_service.dto.PaymentSucceededEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakan.order_service.dto.OrderCreatedEvent;
+import com.kakan.order_service.pojo.Order;
 import com.kakan.order_service.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -16,50 +17,39 @@ public class OrderEventListener {
 
     public OrderEventListener(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
-        log.info("OrderEventListener initialized successfully");
     }
 
-    @KafkaListener(
-            topics = "payment.succeeded",
-            containerFactory = "paymentSucceededKafkaListenerFactory"
-    )
-    public void onPaymentSucceeded(PaymentSucceededEvent event) {
-        log.info("OrderEventListener received PaymentSucceededEvent: orderId={}, accountId={}, paymentId={}",
-                event.getOrderId(), event.getAccountID(), event.getPaymentId());
-        
+    @KafkaListener(topics = "reversed-orders", groupId = "orders-group")
+    public void reverseOrder(String event) {
+        System.out.println("Inside reverse order for order "+event);
+
         try {
-            orderRepository.findById(event.getOrderId()).ifPresent(order -> {
-                log.info("Updating order {} from status {} to ACTIVE", order.getOrderId(), order.getStatus());
-                order.setStatus("ACTIVE");
-                order.setUpdatedAt(OffsetDateTime.now());
-                orderRepository.save(order);
-                log.info("Successfully updated order {} to ACTIVE status", order.getOrderId());
+            OrderCreatedEvent orderEvent = new ObjectMapper().readValue(event, OrderCreatedEvent.class);
+
+            Optional<Order> order = orderRepository.findById(orderEvent.getOrder().getOrderId());
+
+            order.ifPresent(o -> {
+                o.setStatus("FAILED");
+                this.orderRepository.save(o);
             });
         } catch (Exception e) {
-            log.error("Error processing PaymentSucceededEvent for orderId {}: {}", event.getOrderId(), e.getMessage(), e);
-            throw e; // Re-throw để Kafka có thể retry nếu cần
+            e.printStackTrace();
         }
     }
 
-    @KafkaListener(
-            topics = "payment.failed",
-            containerFactory = "paymentFailedKafkaListenerFactory"
-    )
-    public void onPaymentFailed(PaymentFailedEvent event) {
-        log.info("OrderEventListener received PaymentFailedEvent: orderId={}, reason={}",
-                event.getOrderId(), event.getReason());
-        
-        try {
-            orderRepository.findById(event.getOrderId()).ifPresent(order -> {
-                log.info("Updating order {} from status {} to CANCELLED", order.getOrderId(), order.getStatus());
-                order.setStatus("CANCELLED");
-                order.setUpdatedAt(OffsetDateTime.now());
-                orderRepository.save(order);
-                log.info("Successfully updated order {} to CANCELLED status", order.getOrderId());
+    @KafkaListener(topics = "new-payments", groupId = "orders-group")
+    public void succeedPayment(String event){
+        try{
+            OrderCreatedEvent orderEvent = new ObjectMapper().readValue(event, OrderCreatedEvent.class);
+            Optional<Order> order = orderRepository.findById(orderEvent.getOrder().getOrderId());
+            order.ifPresent(o -> {
+                o.setStatus("ACTIVE");
+                this.orderRepository.save(o);
             });
         } catch (Exception e) {
-            log.error("Error processing PaymentFailedEvent for orderId {}: {}", event.getOrderId(), e.getMessage(), e);
-            throw e; // Re-throw để Kafka có thể retry nếu cần
+            throw new RuntimeException(e);
         }
     }
+
+
 }

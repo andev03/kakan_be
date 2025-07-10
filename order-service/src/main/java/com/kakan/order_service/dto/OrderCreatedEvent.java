@@ -12,8 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderCreatedEvent {
-    private Integer orderId;
-    private Integer accountID;
-    private Double amount;
+    private CustomerOrder order;
+
     // constructors, getters/setters
 }

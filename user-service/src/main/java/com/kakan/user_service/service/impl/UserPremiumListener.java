@@ -1,5 +1,9 @@
 package com.kakan.user_service.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakan.user_service.dto.PaymentEvent;
 import com.kakan.user_service.dto.PaymentSucceededEvent;
 import com.kakan.user_service.repository.AccountRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,24 +20,16 @@ public class UserPremiumListener {
         log.info("UserPremiumListener initialized successfully");
     }
 
-    @KafkaListener(
-            topics = "payment.succeeded",
-            containerFactory = "paymentSucceededKafkaListenerFactory"
-    )
-    public void onPaymentSucceeded(PaymentSucceededEvent evt) {
-        log.info("UserPremiumListener received PaymentSucceededEvent: orderId={}, accountId={}, paymentId={}",
-                evt.getOrderId(), evt.getAccountID(), evt.getPaymentId());
-        
+    @KafkaListener(topics = "new-payments", groupId = "payments-group")
+    public void onPaymentSucceeded(String paymentEvent) throws JsonMappingException, JsonProcessingException {
+        PaymentEvent p = new ObjectMapper().readValue(paymentEvent, PaymentEvent.class);
         try {
-            accountRepository.findById(evt.getAccountID()).ifPresent(account -> {
-                log.info("Updating account {} from role {} to PREMIUM", account.getId(), account.getRole());
+            accountRepository.findById(p.getOrder().getAccountId()).ifPresent(account -> {
                 account.setRole("PREMIUM"); // hoặc cập nhật role khác nếu cần
                 accountRepository.save(account);
-                log.info("Successfully updated account {} to PREMIUM role", account.getId());
             });
         } catch (Exception e) {
-            log.error("Error processing PaymentSucceededEvent for accountId {}: {}", evt.getAccountID(), e.getMessage(), e);
-            throw e; // Re-throw để Kafka có thể retry nếu cần
+            throw e;
         }
     }
 }

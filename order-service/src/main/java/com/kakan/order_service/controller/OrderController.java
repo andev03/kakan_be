@@ -1,5 +1,6 @@
 package com.kakan.order_service.controller;
 
+import com.kakan.order_service.dto.CustomerOrder;
 import com.kakan.order_service.dto.response.ResponseDto;
 import com.kakan.order_service.pojo.Order;
 import com.kakan.order_service.service.OrderService;
@@ -14,10 +15,10 @@ public class OrderController {
 
     @Autowired
     OrderService orderService;
-    @PostMapping("/create/{accountId}")
-    public ResponseDto<Order> createOrder(@PathVariable int accountId) {
+    @PostMapping("/create")
+    public ResponseDto<Order> createOrder(@RequestBody CustomerOrder customerOrder) {
         try{
-           Order order = orderService.createOrder(accountId);
+           Order order = orderService.createOrder(customerOrder);
            return new ResponseDto<>(200, "Order created successfully", order);
         } catch (Exception e) {
             throw new RuntimeException(e);

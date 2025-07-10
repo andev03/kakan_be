@@ -1,8 +1,10 @@
 package com.kakan.payment_service.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakan.payment_service.config.VNPayConfig;
-import com.kakan.payment_service.dto.PaymentFailedEvent;
-import com.kakan.payment_service.dto.PaymentSucceededEvent;
+import com.kakan.payment_service.dto.*;
 import com.kakan.payment_service.dto.request.CreatePaymentRequest;
 import com.kakan.payment_service.dto.response.CreatePaymentResponse;
 import com.kakan.payment_service.dto.response.PaymentResponse;
@@ -12,10 +14,14 @@ import com.kakan.payment_service.repository.PaymentRepository;
 import com.kakan.payment_service.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.RequestScope;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -35,112 +41,144 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    private final KafkaTemplate<String,Object> kafkaTemplate;
+    private Integer paymentId;
+
+    private OrderCreatedEvent orderCreatedEvent;
+
+    @Autowired
+    private  KafkaTemplate<String, OrderCreatedEvent> kafkaOrderTemplate;
+
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public PaymentServiceImpl(KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentServiceImpl.class);
+
+    @KafkaListener(topics = "new-orders", groupId = "orders-group")
+    public void processPayment(String event) throws  JsonProcessingException {
+        LOGGER.info(String.format("message received -> %s", event ));
+        System.out.println("Recieved event for payment " + event);
+        OrderCreatedEvent orderEvent = new ObjectMapper().readValue(event, OrderCreatedEvent.class);
+        orderCreatedEvent = orderEvent;
+        CustomerOrder order = orderEvent.getOrder();
+
+        Payment payment = new Payment();
+
+        try {
+            payment.setOrderId(order.getOrderId());
+            payment.setAccountId(order.getAccountId());
+            payment.setAmount(order.getAmount());
+            payment.setPaymentMethod("VNPAY");
+            payment.setPaymentDate(OffsetDateTime.now());
+            payment.setStatus(PaymentEnums.PENDING.name());
+            payment.setResponseMessage("Chờ thanh toán");
+            Payment payment1 = paymentRepository.save(payment);
+
+            paymentId = payment1.getPaymentId();
+        } catch (Exception e) {
+            payment.setOrderId(order.getOrderId());
+            payment.setStatus("FAILED");
+            paymentRepository.save(payment);
+        }
+    }
 
     @Override
-    public CreatePaymentResponse createPaymentURL(CreatePaymentRequest createPaymentRequest, HttpServletRequest request) {
-        Payment payment = new Payment();
-        payment.setOrderId(createPaymentRequest.getOrderId());
-        payment.setAccountId(createPaymentRequest.getAccountId());
-        payment.setAmount(createPaymentRequest.getAmount());
-        payment.setPaymentMethod("VNPAY");
-        payment.setPaymentDate(OffsetDateTime.now());
-        payment.setStatus(PaymentEnums.PENDING.name());
-        payment.setResponseMessage("Chờ thanh toán");
-        paymentRepository.save(payment);
-        // Chuẩn bị tham số cho VNPAY
-        // VNPAY yêu cầu số tiền là long (đã nhân 100).
-        // Dùng BigDecimal để giữ độ chính xác cao hơn
-        BigDecimal rawAmount = BigDecimal.valueOf(createPaymentRequest.getAmount()).multiply(BigDecimal.valueOf(100));
-        long amount = rawAmount.longValue(); // Đây là giá trị cần truyền cho VNPAY
+    public CreatePaymentResponse createPaymentURL(CustomerOrder order, HttpServletRequest request) {
+            Payment payment = paymentRepository.findById(paymentId).orElse(null);
+            // Chuẩn bị tham số cho VNPAY
+            // VNPAY yêu cầu số tiền là long (đã nhân 100).
+            // Dùng BigDecimal để giữ độ chính xác cao hơn
+            BigDecimal rawAmount = BigDecimal.valueOf(order.getAmount()).multiply(BigDecimal.valueOf(100));
+            long amount = rawAmount.longValue(); // Đây là giá trị cần truyền cho VNPAY
 
-        String vnp_Version = "2.1.0";
-        String vnp_Command = "pay";
-        String vnp_TxnRef = createPaymentRequest.getOrderId() + "_" + payment.getPaymentId(); // OrderId_PaymentId
-        String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
-        String vnp_OrderType = "other"; // Required parameter
-        String vnp_IpAddr = "127.0.0.1";
+            String vnp_Version = "2.1.0";
+            String vnp_Command = "pay";
+            String vnp_TxnRef = order.getOrderId() + "_" + payment.getPaymentId(); // OrderId_PaymentId
+            String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
+            String vnp_OrderType = "other"; // Required parameter
+            String vnp_IpAddr = "127.0.0.1";
 
-        Map<String, String> vnp_Params = new HashMap<>();
-        vnp_Params.put("vnp_Version", vnp_Version);
-        vnp_Params.put("vnp_Command", vnp_Command);
-        vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
-        vnp_Params.put("vnp_Amount", String.valueOf(amount));
-        vnp_Params.put("vnp_CurrCode", "VND");
-        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang: " + vnp_TxnRef);
-        vnp_Params.put("vnp_OrderType", vnp_OrderType); // Added missing parameter
-        vnp_Params.put("vnp_Locale", "vn");
-        vnp_Params.put("vnp_BankCode", "NCB");
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
-        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+            Map<String, String> vnp_Params = new HashMap<>();
+            vnp_Params.put("vnp_Version", vnp_Version);
+            vnp_Params.put("vnp_Command", vnp_Command);
+            vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
+            vnp_Params.put("vnp_Amount", String.valueOf(amount));
+            vnp_Params.put("vnp_CurrCode", "VND");
+            vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
+            vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang: " + vnp_TxnRef);
+            vnp_Params.put("vnp_OrderType", vnp_OrderType); // Added missing parameter
+            vnp_Params.put("vnp_Locale", "vn");
+            vnp_Params.put("vnp_BankCode", "NCB");
+            vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
+            vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        String vnp_CreateDate = formatter.format(cld.getTime());
-        vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
+            Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+            String vnp_CreateDate = formatter.format(cld.getTime());
+            vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
-        cld.add(Calendar.MINUTE, 15);
-        String vnp_ExpireDate = formatter.format(cld.getTime());
-        vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
+            cld.add(Calendar.MINUTE, 15);
+            String vnp_ExpireDate = formatter.format(cld.getTime());
+            vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
-        List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
-        Collections.sort(fieldNames);
-        StringBuilder hashData = new StringBuilder();
-        StringBuilder query = new StringBuilder();
-        Iterator<String> itr = fieldNames.iterator();
+            List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
+            Collections.sort(fieldNames);
+            StringBuilder hashData = new StringBuilder();
+            StringBuilder query = new StringBuilder();
+            Iterator<String> itr = fieldNames.iterator();
 
-        while (itr.hasNext()) {
-            String fieldName = itr.next();
-            String fieldValue = vnp_Params.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                // Build hash data
-                hashData.append(fieldName);
-                hashData.append('=');
-                try {
-                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()));
-                } catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException(e);
-                }
+            while (itr.hasNext()) {
+                String fieldName = itr.next();
+                String fieldValue = vnp_Params.get(fieldName);
+                if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                    // Build hash data
+                    hashData.append(fieldName);
+                    hashData.append('=');
+                    try {
+                        hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()));
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
 
-                // Build query - DON'T encode field names, only values
-                query.append(fieldName);
-                query.append('=');
-                try {
-                    query.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()));
-                } catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException(e);
-                }
+                    // Build query - DON'T encode field names, only values
+                    query.append(fieldName);
+                    query.append('=');
+                    try {
+                        query.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()));
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
 
-                if (itr.hasNext()) {
-                    query.append('&');
-                    hashData.append('&');
+                    if (itr.hasNext()) {
+                        query.append('&');
+                        hashData.append('&');
+                    }
                 }
             }
-        }
 
-        String queryUrl = query.toString();
-        String vnp_SecureHash = VNPayConfig.hmacSHA512(secretKey, hashData.toString());
-        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-        String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
+            String queryUrl = query.toString();
+            String vnp_SecureHash = VNPayConfig.hmacSHA512(secretKey, hashData.toString());
+            queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+            String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
+
 //        CreatePaymentResponse paymentResponse = new CreatePaymentResponse();
 //        paymentResponse.setMessage("Tạo URL thanh toán thành công");
 //        paymentResponse.setPaymentUrl(paymentUrl);
-        return CreatePaymentResponse.builder()
-                .message("Tạo URL thanh toán thành công")
-                .paymentUrl(paymentUrl)
-                .build();
+            return CreatePaymentResponse.builder()
+                    .message("Tạo URL thanh toán thành công")
+                    .paymentUrl(paymentUrl)
+                    .build();
     }
 
     @Override
     public PaymentResponse vnPayReturn(HttpServletRequest request) {
+
+
+
         Map fields = new HashMap();
-        for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
+        for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
             String fieldName = (String) params.nextElement();
             String fieldValue = request.getParameter(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
@@ -158,8 +196,6 @@ public class PaymentServiceImpl implements PaymentService {
             Double amount = amountFromVNPAY / 100.0; // Parse ngược lại
 
 
-
-
             String[] txnRefParts = vnp_TxnRef.split("_");
             Integer orderId = Integer.parseInt(txnRefParts[0]);
             Integer paymentId = Integer.parseInt(txnRefParts[1]);
@@ -167,7 +203,7 @@ public class PaymentServiceImpl implements PaymentService {
 //            Optional<Order> optionalOrder = orderRepository.findById(orderId);
             Optional<Payment> optionalPayment = paymentRepository.findById(paymentId);
 
-            if ( optionalPayment.isPresent()) {
+            if (optionalPayment.isPresent()) {
 //                Order order = optionalOrder.get();
                 Payment payment = optionalPayment.get();
 
@@ -183,61 +219,22 @@ public class PaymentServiceImpl implements PaymentService {
 //                    order.setExpiredDate(OffsetDateTime.now().plusDays(30)); // Đặt ngày hết hạn là 30 ngày kể từ khi thanh toán thành công
                     payment.setStatus(PaymentEnums.SUCCESS.name());
                     payment.setResponseMessage("Thanh toán thành công");
-                    
-                    PaymentSucceededEvent successEvent = new PaymentSucceededEvent(
-                            payment.getOrderId(),
-                            payment.getAccountId(),
-                            payment.getPaymentId()
-                    );
-                    
-                    log.info("Sending PaymentSucceededEvent for orderId: {}, accountId: {}, paymentId: {}",
-                            payment.getOrderId(), payment.getAccountId(), payment.getPaymentId());
-                    
-                    try {
-                        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send("payment.succeeded", successEvent);
-                        future.whenComplete((result, ex) -> {
-                            if (ex == null) {
-                                log.info("Successfully sent PaymentSucceededEvent for orderId: {} with offset: {}",
-                                        payment.getOrderId(), result.getRecordMetadata().offset());
-                            } else {
-                                log.error("Failed to send PaymentSucceededEvent for orderId: {}: {}", 
-                                        payment.getOrderId(), ex.getMessage(), ex);
-                            }
-                        });
-                    } catch (Exception e) {
-                        log.error("Error sending PaymentSucceededEvent for orderId: {}: {}", payment.getOrderId(), e.getMessage(), e);
-                        throw e;
-                    }
+
+                    PaymentEvent paymentEvent = new PaymentEvent();
+                    paymentEvent.setOrder(orderCreatedEvent.getOrder());
+                    kafkaTemplate.send("new-payments", paymentEvent);
+                    orderCreatedEvent = null;
                 } else {
                     // Giao dịch thất bại
 //                    order.setStatus(OrderStatus.CANCELLED.name());
 //                    order.setNote("Thanh toán thất bại.");
                     payment.setStatus(PaymentEnums.FAILED.name());
                     payment.setResponseMessage("Thanh toán thất bại. Mã lỗi VNPAY: " + vnp_ResponseCode + ", Trạng thái: " + vnp_TransactionStatus);
-                    
-                    PaymentFailedEvent failedEvent = new PaymentFailedEvent(
-                            payment.getOrderId(),
-                            payment.getResponseMessage()
-                    );
-                    
-                    log.info("Sending PaymentFailedEvent for orderId: {}, reason: {}",
-                            payment.getOrderId(), payment.getResponseMessage());
-                    
-                    try {
-                        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send("payment.failed", failedEvent);
-                        future.whenComplete((result, ex) -> {
-                            if (ex == null) {
-                                log.info("Successfully sent PaymentFailedEvent for orderId: {} with offset: {}",
-                                        payment.getOrderId(), result.getRecordMetadata().offset());
-                            } else {
-                                log.error("Failed to send PaymentFailedEvent for orderId: {}: {}", 
-                                        payment.getOrderId(), ex.getMessage(), ex);
-                            }
-                        });
-                    } catch (Exception e) {
-                        log.error("Error sending PaymentFailedEvent for orderId: {}: {}", payment.getOrderId(), e.getMessage(), e);
-                        throw e;
-                    }
+
+                    OrderCreatedEvent oe = new OrderCreatedEvent();
+                    oe.setOrder(orderCreatedEvent.getOrder());
+                    kafkaOrderTemplate.send("reversed-orders", orderCreatedEvent);
+                    orderCreatedEvent = null;
                 }
 //                orderRepository.save(order);
                 paymentRepository.save(payment);

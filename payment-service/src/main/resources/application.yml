@@ -16,35 +16,22 @@ spring:
         ddl-auto: none
         format_sql: true
     show-sql: true
-  sql:
-    init:
-      mode: always
+#  sql:
+#    init:
+#      mode: always
   kafka:
     bootstrap-servers: localhost:9092
-
-    # consumer (Payment lắng nghe order.created)
     consumer:
-      group-id: payment-service
+      group-id: payments-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       auto-offset-reset: earliest
-      enable-auto-commit: true
-      auto-commit-interval: 1000
-      properties:
-        spring.json.use.type.headers: false
-        spring.json.trusted.packages: "com.kakan.*.dto"
-
-    # producer (Payment phát payment.succeeded / .failed)
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.add.type.headers: false
 
 logging:
   level:
-    org.springframework.kafka: DEBUG
-    org.apache.kafka.clients.producer.KafkaProducer: TRACE
     org.springframework.kafka.listener: DEBUG
     org.apache.kafka.clients.consumer: TRACE
     root: warn

@@ -1,5 +1,10 @@
 package com.kakan.payment_service.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakan.payment_service.dto.CustomerOrder;
+import com.kakan.payment_service.dto.OrderCreatedEvent;
 import com.kakan.payment_service.dto.request.CreatePaymentRequest;
 import com.kakan.payment_service.dto.response.CreatePaymentResponse;
 import com.kakan.payment_service.dto.response.PaymentResponse;
@@ -10,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
@@ -22,16 +28,15 @@ public class PaymentController {
     private PaymentServiceImpl paymentService;
 
 
-    @PostMapping("/create-payment")
-    public ResponseDto<CreatePaymentResponse> createPayment(@RequestBody @Valid CreatePaymentRequest createPaymentRequest, HttpServletRequest request)  {
 
-            CreatePaymentResponse result = paymentService.createPaymentURL(createPaymentRequest, request);
+    @PostMapping("/create-payment")
+    public ResponseDto<CreatePaymentResponse> createPayment(@Valid @RequestBody CustomerOrder order,HttpServletRequest request){
+            CreatePaymentResponse result = paymentService.createPaymentURL(order,request);
             return ResponseDto.<CreatePaymentResponse>builder()
                     .message("Payment URL created successfully")
                     .data(result)
                     .status(HttpStatus.OK.value())
                     .build();
-
     }
 
     @GetMapping("/vnpay-return")

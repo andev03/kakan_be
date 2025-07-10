@@ -1,5 +1,6 @@
 package com.kakan.order_service.service.impl;
 
+import com.kakan.order_service.dto.CustomerOrder;
 import com.kakan.order_service.dto.OrderCreatedEvent;
 import com.kakan.order_service.pojo.Order;
 import com.kakan.order_service.repository.OrderRepository;
@@ -27,46 +28,31 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
     @Autowired 
     private KafkaTemplate<String, Object> kafkaTemplate;
+
+
     @Transactional
-    @SneakyThrows
-    public Order createOrder(int accountId) {
+    public Order createOrder(CustomerOrder customerOrder) {
         Order order = new Order();
-        order.setAccountId(accountId);
-        order.setStatus("PENDING");
-        order.setPrice(50000.00); // Mặc định giá là 50k
-        order.setOrderDate(now());
-        order.setExpiredDate(now().plusDays(30)); // Hết hạn sau 30 ngày kể từ ngày tạo
-        order.setUpdatedAt(now());
-        orderRepository.save(order);
+        try{
+            order.setAccountId(customerOrder.getAccountId());
+            order.setStatus("PENDING");
+            order.setPrice(50000.00); // Mặc định giá là 50k
+            order.setOrderDate(now());
+            order.setExpiredDate(now().plusDays(30)); // Hết hạn sau 30 ngày kể từ ngày tạo
+            order.setUpdatedAt(now());
+            orderRepository.save(order);
 
-        // phát event OrderCreated
-        OrderCreatedEvent evt = new OrderCreatedEvent(
-                order.getOrderId(),
-                accountId,
-                order.getPrice()
-        );
-        
-        log.info("Sending OrderCreatedEvent for orderId: {}, accountId: {}, amount: {}", 
-                order.getOrderId(), accountId, order.getPrice());
-        
-        try {
-            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send("order.created", evt);
-            future.whenComplete((result, ex) -> {
-                if (ex == null) {
-                    log.info("Successfully sent OrderCreatedEvent for orderId: {} with offset: {}",
-                            order.getOrderId(), result.getRecordMetadata().offset());
-                } else {
-                    log.error("Failed to send OrderCreatedEvent for orderId: {}: {}", 
-                            order.getOrderId(), ex.getMessage(), ex);
-                }
-            });
+            customerOrder.setOrderId(order.getOrderId());
+            // phát event OrderCreated
+            OrderCreatedEvent evt = new OrderCreatedEvent();
+            evt.setOrder(customerOrder);
+            kafkaTemplate.send("new-orders", evt);
+            System.out.println(evt);
         } catch (Exception e) {
-            log.error("Error sending OrderCreatedEvent for orderId: {}: {}", order.getOrderId(), e.getMessage(), e);
-            throw e;
+            order.setStatus("FAILED");
+            orderRepository.save(order);
         }
-        
         return order;
-
     }
 
 
