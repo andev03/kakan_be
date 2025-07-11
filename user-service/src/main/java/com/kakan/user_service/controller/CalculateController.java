@@ -42,7 +42,7 @@ public class CalculateController {
 //        return new ResponseDto<>(200, "Block scores calculated successfully", blockScores);
 //    }
 
-    @PostMapping(value = "/calculate/score")
+        @PostMapping(value = "/calculate/score")
     public ResponseDto<CalculateScoreDto> calculateScore(@RequestBody @Valid ScoreRequest dto) {
         CalculateScoreDto score = scoreService.calculateScore(dto.getSubjectScores());
         return new ResponseDto<>(200, "Scores calculated successfully", score);
