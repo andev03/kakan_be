@@ -8,12 +8,14 @@ import com.kakan.user_service.mapper.AccountMapper;
 import com.kakan.user_service.mapper.UserInformationMapper;
 import com.kakan.user_service.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class AdminController {
     @Autowired
     AdminService adminService;
@@ -23,14 +25,14 @@ public class AdminController {
     UserInformationMapper userInformationMapper;
 
 
-    @GetMapping("/user-list")
-    public ResponseDto<List<UserInformationDto>> getAllUser() {
+    @GetMapping("/user-list/test")
+    public ResponseDto<List<UserInformationDto>> getAllUserTest() {
         List<UserInformationDto> userInformationDtos = userInformationMapper.toDtoList(adminService.getAllUser());
         return new ResponseDto<>(200,"successfully", userInformationDtos);
     }
 
-    @GetMapping("/user-list/test")
-    public ResponseDto<List<AccountInformationDto>> getAllUserTest() {
+    @GetMapping("/user-list")
+    public ResponseDto<List<AccountInformationDto>> getAllUser() {
         List<AccountInformationDto> userInformationDtos = adminService.getAllUserInformationByAdmin();
         return new ResponseDto<>(200,"successfully", userInformationDtos);
     }

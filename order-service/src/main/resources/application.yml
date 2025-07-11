@@ -2,7 +2,7 @@ server:
   port: 8004
 spring:
   application:
-    name: admission-advisor-service
+    name: order-service
   datasource:
     url: jdbc:postgresql://localhost:5432/order_service_db
     username: postgres
@@ -19,9 +19,23 @@ spring:
   sql:
     init:
       mode: always
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: orders-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
 
 logging:
   level:
+    org.springframework.kafka: DEBUG
+    org.apache.kafka.clients.producer.KafkaProducer: TRACE
+    org.springframework.kafka.listener: DEBUG
+    org.apache.kafka.clients.consumer: TRACE
     root: warn
     org:
       hibernate:

@@ -32,7 +32,7 @@ public class AdminServiceImpl implements AdminService {
     public List<AccountInformationDto> getAllUserInformationByAdmin(){
         List<Account> accounts = accountRepository.findAll();
         List<UserInformation> userInformations = userInformationRepository.findAll();
-        List<AccountInformationDto> a = new ArrayList<>();
+        List<AccountInformationDto> accountInformationDtos = new ArrayList<>();
         for (Account account : accounts) {
             for (UserInformation userInformation : userInformations) {
                 if (account.getId().equals(userInformation.getAccount().getId())) {
@@ -44,12 +44,15 @@ public class AdminServiceImpl implements AdminService {
                     dto.setDob(userInformation.getDob());
                     dto.setPhone(userInformation.getPhone());
                     dto.setAddress(userInformation.getAddress());
+                    dto.setActive(account.getIsActive());
+                    dto.setCreateDate(account.getCreateDate());
+                    dto.setRole(account.getRole());
                     dto.setAvatarUrl(userInformation.getAvatarUrl());
-                    a.add(dto);
+                    accountInformationDtos.add(dto);
                 }
             }
         }
-        return a;
+        return accountInformationDtos;
     }
 
     public void blockUser(int id){

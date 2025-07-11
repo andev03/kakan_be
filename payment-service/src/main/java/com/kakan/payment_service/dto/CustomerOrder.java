@@ -1,14 +1,12 @@
-package com.kakan.payment_service.dto.request;
+package com.kakan.payment_service.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class CreatePaymentRequest {
+public class CustomerOrder {
     @NotNull(message = "Order ID is required")
     private Integer orderId;
 

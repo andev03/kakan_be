@@ -1,15 +1,15 @@
-package com.kakan.payment_service.dto.request;
+package com.kakan.order_service.dto;
 
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class CreatePaymentRequest {
-    @NotNull(message = "Order ID is required")
+public class CustomerOrder {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer orderId;
 
     @NotNull(message = "Account ID is required")

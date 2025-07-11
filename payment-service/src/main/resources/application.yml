@@ -2,7 +2,7 @@ server:
   port: 8005
 spring:
   application:
-    name: admission-advisor-service
+    name: payment-service
   datasource:
     url: jdbc:postgresql://localhost:5432/payment_service_db
     username: postgres
@@ -16,12 +16,24 @@ spring:
         ddl-auto: none
         format_sql: true
     show-sql: true
-  sql:
-    init:
-      mode: always
+#  sql:
+#    init:
+#      mode: always
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: payments-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 logging:
   level:
+    org.springframework.kafka.listener: DEBUG
+    org.apache.kafka.clients.consumer: TRACE
     root: warn
     org:
       hibernate:

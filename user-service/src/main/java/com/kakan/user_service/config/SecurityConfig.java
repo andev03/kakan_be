@@ -54,7 +54,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                //.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/login", "/api/register", "/api/loginByGoogle",
                                 "/oauth2/authorization/**", "/login/oauth2/code/**",
@@ -89,27 +88,28 @@ public class SecurityConfig {
             // Gọi service để xử lý logic đăng nhập và tạo token
             AccountResponse accountResponse = authenticationService.processOAuthPostLogin(oAuth2User);
 
-//            if (accountResponse == null) {
-//                // Nếu tài khoản bị vô hiệu hóa, chuyển hướng với thông báo lỗi
-//                String redirectUrl = "";
-//                response.sendRedirect(redirectUrl);
-//                return;
-//            }
+            if (accountResponse == null) {
+                // Nếu tài khoản bị vô hiệu hóa, chuyển hướng với thông báo lỗi
+                String redirectUrl = "https://nguyenhoangan.site/login/success?error=disabled";
+                response.sendRedirect(redirectUrl);
+                return;
+            }
 
-//             //Mã hóa các thông tin để gửi qua URL
-//            String encodedToken = URLEncoder.encode(accountResponse.getToken(), "UTF-8");
-//            String encodedUsername = URLEncoder.encode(accountResponse.getUserName(), "UTF-8");
-//            String role = URLEncoder.encode(accountResponse.getRole(), "UTF-8");
+             //Mã hóa các thông tin để gửi qua URL
+            String encodedToken = URLEncoder.encode(accountResponse.getToken(), "UTF-8");
+            String encodedUsername = URLEncoder.encode(accountResponse.getUserName(), "UTF-8");
+            String role = URLEncoder.encode(accountResponse.getRole(), "UTF-8");
+
+            String redirectUrl = "https://nguyenhoangan.site/login/success?token=" +
+                    encodedToken + "&username=" + encodedUsername + "&role=" + role;
+            response.sendRedirect(redirectUrl);
+
+//            Map<String, String> tokenMap = new HashMap<>();
+//            tokenMap.put("access_token", accountResponse.getToken());
 //
-//            String redirectUrl = "http://localhost:5173/forum/";
-//            response.sendRedirect(redirectUrl);
-
-            Map<String, String> tokenMap = new HashMap<>();
-            tokenMap.put("access_token", accountResponse.getToken());
-
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            objectMapper.writeValue(response.getWriter(), tokenMap);
+//            response.setStatus(HttpServletResponse.SC_OK);
+//            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//            objectMapper.writeValue(response.getWriter(), tokenMap);
         };
     }
 

@@ -50,7 +50,8 @@ public class ScoreServiceImpl implements ScoreService {
                 if (subject == null) {
                     throw new RuntimeException("Subject not found for name: " + subjectName);
                 }
-                for (Score existingScore : scoreRepository.findScoreByAccount_Id(account.getId())) {
+                List<Score> scoreExist = scoreRepository.findScoreByAccount_Id(account.getId());
+                for (Score existingScore : scoreExist) {
                     if (existingScore.getSubject().getSubjectName().equals(subjectName)) {
                         existingScore.setScoreYear10(dto.getScoreYear10());
                         existingScore.setScoreYear11(dto.getScoreYear11());
