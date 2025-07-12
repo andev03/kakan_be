@@ -19,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Validated
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@RequestMapping("/api")
+
 public class UserInformationController {
 
     private final UserInformationService userInformationService;
