@@ -46,7 +46,7 @@ public class UserInformationServiceImpl implements UserInformationService {
 
     @Override
     @Transactional
-    public UpdateUserInformationRequest updateUserInformation(UpdateUserInformationRequest request) throws IOException {
+    public void updateUserInformation(UpdateUserInformationRequest request) {
         try{
             Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             UserInformation userInformation = userInformationRepository.findByAccountId(account.getId());
@@ -68,21 +68,16 @@ public class UserInformationServiceImpl implements UserInformationService {
                 userInformation.setAddress(request.getAddress());
             }
             // Xử lý upload ảnh nếu có
-            if (request.getAvatarBase64() != null && !request.getAvatarBase64().isEmpty()) {
+            if (request.getAvatarUrl() != null && !request.getAvatarUrl().isEmpty()) {
                // MultipartFile file = decodeBase64ToMultipartFile(request.getAvatarBase64());
-                uploadImage(account.getId(),request.getAvatarBase64());
+                uploadImage(account.getId(),request.getAvatarUrl());
             }
             userInformationRepository.save(userInformation);
-            return modelMapper.map(userInformation, UpdateUserInformationRequest.class);
         }catch (DuplicateEntity e) {
             throw new DuplicateEntity(e.getMessage());
         } catch (RuntimeException e) {
             throw new RuntimeException("Đã xảy ra lỗi trong quá trình cập nhật thông tin học sinh.");
         }
-//        }catch (IOException e) {
-//            throw new IOException("Lỗi khi giải mã ảnh từ Base64: " + e.getMessage());
-//        }
-
     }
 
     @Transactional

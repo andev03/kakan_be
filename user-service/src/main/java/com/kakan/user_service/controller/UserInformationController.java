@@ -32,11 +32,11 @@ public class UserInformationController {
         this.userInformationService = userInformationService;
     }
 
-    @PutMapping("/user/information")
-    public ResponseDto<UpdateUserInformationRequest> updateUserInformation(@RequestBody UpdateUserInformationRequest request) {
+    @PutMapping("/update/information")
+    public ResponseDto updateUserInformation(@ModelAttribute UpdateUserInformationRequest request) {
         try{
-            UpdateUserInformationRequest result = userInformationService.updateUserInformation(request);
-            return new ResponseDto<>(HttpStatus.OK.value(), "Cập nhật thông tin học sinh thành công.", result );
+             userInformationService.updateUserInformation(request);
+            return new ResponseDto<>(HttpStatus.OK.value(), "Cập nhật thông tin học sinh thành công.", null );
         }catch (DuplicateEntity e){
             return new ResponseDto<>(HttpStatus.CONFLICT.value(), e.getMessage(), null);
         } catch (RuntimeException e) {

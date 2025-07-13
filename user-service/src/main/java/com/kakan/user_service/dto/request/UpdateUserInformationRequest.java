@@ -24,6 +24,6 @@ public class UpdateUserInformationRequest {
 
     private String address;
 
-    private MultipartFile avatarBase64;
+    private MultipartFile avatarUrl;
 
 }

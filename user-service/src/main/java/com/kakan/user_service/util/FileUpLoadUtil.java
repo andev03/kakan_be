@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class FileUpLoadUtil {
     public static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-    public static final String IMAGE_PATTERN = "(.+\\.(?i)(jpg|png|gif|bmp))$";
+    public static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)";
 
     public static final String DATE_FORMAT = "yyyyMMddHHmmss";
 
