@@ -16,6 +16,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Validated
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -39,6 +41,8 @@ public class UserInformationController {
             return new ResponseDto<>(HttpStatus.CONFLICT.value(), e.getMessage(), null);
         } catch (RuntimeException e) {
             return  new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin học sinh.", null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
     }

@@ -27,6 +27,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(message.toString(), HttpStatus.BAD_REQUEST);
     }
 
+    // Xử lý ngoại lệ NotFoundException (custom)
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundException(NotFoundException ex) {
+        // Trả về HTTP 404 với thông điệp từ exception
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     // Xử lý ngoại lệ EntityNotFoundException (lỗi không tìm thấy)
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<String> handleEntityNotFound(EntityNotFoundException exception) {
