@@ -44,7 +44,6 @@ public class UserInformationController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @PostMapping("/uploadImage/{id}")
