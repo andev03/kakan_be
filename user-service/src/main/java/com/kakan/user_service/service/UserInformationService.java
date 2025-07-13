@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface UserInformationService {
-    UpdateUserInformationRequest updateUserInformation(UpdateUserInformationRequest request) throws IOException;
+    void updateUserInformation(UpdateUserInformationRequest request) throws IOException;
     void uploadImage(final int id, final MultipartFile file);
     ViewUserInformationResponse viewUserInformation();
 }
