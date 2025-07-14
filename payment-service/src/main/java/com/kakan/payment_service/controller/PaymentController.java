@@ -40,9 +40,9 @@ public class PaymentController {
     }
 
     @GetMapping("/vnpay-return")
-    public ResponseDto<PaymentResponse> vnpayReturn(HttpServletRequest request) {
+    public ResponseDto<PaymentResponse> handleVNPayReturn(HttpServletRequest request) {
         try {
-            PaymentResponse result = paymentService.vnPayReturn(request);
+            PaymentResponse result = paymentService.handleVNPayReturn(request);
             return ResponseDto.<PaymentResponse>builder()
                     .message("Payment processed successfully")
                     .data(result)

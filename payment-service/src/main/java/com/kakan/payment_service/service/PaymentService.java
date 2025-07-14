@@ -9,5 +9,5 @@ import jakarta.servlet.http.HttpServletRequest;
 public interface PaymentService {
 
     CreatePaymentResponse createPaymentURL(CustomerOrder order, HttpServletRequest request);
-    PaymentResponse vnPayReturn(HttpServletRequest request);
+    PaymentResponse handleVNPayReturn(HttpServletRequest request);
 }
