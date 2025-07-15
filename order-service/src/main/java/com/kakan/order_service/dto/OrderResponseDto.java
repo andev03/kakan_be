@@ -1,20 +1,16 @@
 package com.kakan.order_service.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class OrderCreatedEvent {
+@Builder
+public class OrderResponseDto {
     private Integer orderId;
 
     private Integer accountId;
-
-    private Double amount;
 
     private String status;
 }

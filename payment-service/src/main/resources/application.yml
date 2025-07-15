@@ -16,9 +16,9 @@ spring:
         ddl-auto: none
         format_sql: true
     show-sql: true
-#  sql:
-#    init:
-#      mode: always
+  sql:
+    init:
+      mode: always
   kafka:
     bootstrap-servers: localhost:9092
     consumer:

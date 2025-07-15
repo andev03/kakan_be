@@ -1,6 +1,5 @@
 DROP TABLE IF EXISTS "order" CASCADE;
 
-
 CREATE TABLE "order" (
     order_id SERIAL PRIMARY KEY,
     account_id INTEGER NOT NULL,
