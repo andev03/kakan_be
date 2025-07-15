@@ -1,7 +1,5 @@
 package com.kakan.payment_service.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakan.payment_service.config.VNPayConfig;
 import com.kakan.payment_service.dto.OrderCreatedEvent;
 import com.kakan.payment_service.dto.request.CreatePaymentRequest;
@@ -34,11 +32,9 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentRepository paymentRepository;
 
     @KafkaListener(topics = "order.success", groupId = "orders-kakan-group")
-    public void handleOrderEvent(String event) throws JsonProcessingException {
-        OrderCreatedEvent order = new ObjectMapper().readValue(event, OrderCreatedEvent.class);
-
+    public void handleOrderEvent(OrderCreatedEvent order) {
+        log.info("Nhận OrderCreatedEvent: {}", order);
         Payment payment = new Payment();
-
         payment.setOrderId(order.getOrderId());
         payment.setAccountId(order.getAccountId());
         payment.setAmount(order.getAmount());
