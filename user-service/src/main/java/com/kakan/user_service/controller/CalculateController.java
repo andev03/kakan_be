@@ -6,6 +6,7 @@ import com.kakan.user_service.dto.response.*;
 import com.kakan.user_service.pojo.Score;
 import com.kakan.user_service.service.ScoreService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public class CalculateController {
     @GetMapping(value = "/view/scoreDetail")
     public ResponseDto<List<ViewScoreDetail>> viewScoreDetail() {
         List<ViewScoreDetail> viewScoreDetail = scoreService.getScoreDetails();
-        return new ResponseDto<>(200, "Score details fetched successfully", viewScoreDetail);
+        return new ResponseDto<>(HttpStatus.OK.value(), "Score details fetched successfully", viewScoreDetail);
     }
 
 //    @PostMapping(value = "/calculate/block-score")
@@ -45,6 +46,6 @@ public class CalculateController {
         @PostMapping(value = "/calculate/score")
     public ResponseDto<CalculateScoreDto> calculateScore(@RequestBody @Valid ScoreRequest dto) {
         CalculateScoreDto score = scoreService.calculateScore(dto.getSubjectScores());
-        return new ResponseDto<>(200, "Scores calculated successfully", score);
+        return new ResponseDto<>(HttpStatus.OK.value(), "Scores calculated successfully", score);
     }
 }
