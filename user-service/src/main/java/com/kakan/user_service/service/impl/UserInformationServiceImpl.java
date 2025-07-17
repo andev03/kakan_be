@@ -67,6 +67,13 @@ public class UserInformationServiceImpl implements UserInformationService {
             if (request.getAddress() != null && !Objects.equals(request.getAddress(), userInformation.getAddress())) {
                 userInformation.setAddress(request.getAddress());
             }
+
+            if (request.getGender() != null && !Objects.equals(request.getGender(), userInformation.getGender())) {
+                userInformation.setGender(Boolean.parseBoolean(request.getGender()));
+            }
+            if (request.getDob() != null && !Objects.equals(request.getDob(), userInformation.getDob())) {
+                userInformation.setDob(request.getDob());
+            }
             // Xử lý upload ảnh nếu có
             if (request.getAvatarUrl() != null && !request.getAvatarUrl().isEmpty()) {
                // MultipartFile file = decodeBase64ToMultipartFile(request.getAvatarBase64());
