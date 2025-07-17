@@ -1,59 +1,69 @@
 package com.kakan.order_service.service.impl;
 
-import com.kakan.order_service.dto.CustomerOrder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakan.order_service.dto.OrderCreatedEvent;
+import com.kakan.order_service.dto.OrderResponseDto;
+import com.kakan.order_service.dto.PaymentEvent;
+import com.kakan.order_service.dto.request.OrderRequestDto;
+import com.kakan.order_service.exception.OrderNotFoundException;
 import com.kakan.order_service.pojo.Order;
 import com.kakan.order_service.repository.OrderRepository;
 import com.kakan.order_service.service.OrderService;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.Message;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
-import java.util.concurrent.CompletableFuture;
-
-import static java.time.OffsetDateTime.now;
-
-@Slf4j
 @Service
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired 
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    private final OrderRepository orderRepository;
 
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    @Transactional
-    public Order createOrder(CustomerOrder customerOrder) {
-        Order order = new Order();
-        try{
-            order.setAccountId(customerOrder.getAccountId());
-            order.setStatus("PENDING");
-            order.setPrice(50000.00); // Mặc định giá là 50k
-            order.setOrderDate(now());
-            order.setExpiredDate(now().plusDays(30)); // Hết hạn sau 30 ngày kể từ ngày tạo
-            order.setUpdatedAt(now());
-            orderRepository.save(order);
+    private final ObjectMapper objectMapper;
 
-            customerOrder.setOrderId(order.getOrderId());
-            // phát event OrderCreated
-            OrderCreatedEvent evt = new OrderCreatedEvent();
-            evt.setOrder(customerOrder);
-            kafkaTemplate.send("new-orders", evt);
-            System.out.println(evt);
-        } catch (Exception e) {
-            order.setStatus("FAILED");
-            orderRepository.save(order);
-        }
-        return order;
+    @Override
+    public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) throws JsonProcessingException {
+        Order savedOrder = saveOrder(orderRequestDto);
+
+        OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent();
+
+        orderCreatedEvent.setOrderId(savedOrder.getOrderId());
+        orderCreatedEvent.setAccountId(savedOrder.getAccountId());
+        orderCreatedEvent.setAmount(savedOrder.getPrice());
+        orderCreatedEvent.setStatus(savedOrder.getStatus());
+
+        String jsonString = objectMapper.writeValueAsString(orderCreatedEvent);
+
+        kafkaTemplate.send("order.success", jsonString);
+
+        return OrderResponseDto.builder()
+                .orderId(orderCreatedEvent.getOrderId())
+                .accountId(orderCreatedEvent.getAccountId())
+                .status(orderCreatedEvent.getStatus())
+                .build();
     }
 
+    private Order saveOrder(OrderRequestDto orderRequestDto) {
+        Order order = new Order();
+        order.setAccountId(orderRequestDto.getAccountId());
+        order.setPrice(orderRequestDto.getAmount());
+        order.setStatus("PENDING");
+        return orderRepository.save(order);
+    }
 
+    @KafkaListener(topics = "payment.success", groupId = "payments-kakan-group")
+    public void handlePaymentEvent(String orderString) throws JsonProcessingException {
+
+        PaymentEvent payment = objectMapper.readValue(orderString, PaymentEvent.class);
+
+        Order order = orderRepository.findById(payment.getOrderId()).orElseThrow(() -> new OrderNotFoundException(payment.getOrderId()));
+
+        order.setStatus(payment.getPaymentStatus());
+
+        orderRepository.save(order);
+    }
 }

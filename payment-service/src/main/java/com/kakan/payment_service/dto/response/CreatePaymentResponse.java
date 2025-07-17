@@ -8,8 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CreatePaymentResponse {
-
     private String message;
-    private String paymentUrl;
 
+    private String paymentUrl;
 }

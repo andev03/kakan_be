@@ -14,7 +14,4 @@ public class CreatePaymentRequest {
 
     @NotNull(message = "Account ID is required")
     private Integer accountId;
-
-    @NotNull(message = "Amount is required")
-    private Double amount;
 }

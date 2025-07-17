@@ -1,13 +1,16 @@
 package com.kakan.payment_service.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class PaymentEvent {
-    private CustomerOrder order;
+    private Integer orderId;
 
+    private String paymentStatus;
 }

@@ -1,24 +1,17 @@
 package com.kakan.payment_service.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kakan.payment_service.dto.CustomerOrder;
-import com.kakan.payment_service.dto.OrderCreatedEvent;
 import com.kakan.payment_service.dto.request.CreatePaymentRequest;
 import com.kakan.payment_service.dto.response.CreatePaymentResponse;
-import com.kakan.payment_service.dto.response.PaymentResponse;
+import com.kakan.payment_service.dto.response.PaymentDto;
 import com.kakan.payment_service.dto.response.ResponseDto;
-import com.kakan.payment_service.service.PaymentService;
 import com.kakan.payment_service.service.impl.PaymentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.UnsupportedEncodingException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
@@ -27,32 +20,32 @@ public class PaymentController {
     @Autowired
     private PaymentServiceImpl paymentService;
 
-
-
-    @PostMapping("/create-payment")
-    public ResponseDto<CreatePaymentResponse> createPayment(@Valid @RequestBody CustomerOrder order,HttpServletRequest request){
-            CreatePaymentResponse result = paymentService.createPaymentURL(order,request);
-            return ResponseDto.<CreatePaymentResponse>builder()
-                    .message("Payment URL created successfully")
-                    .data(result)
-                    .status(HttpStatus.OK.value())
-                    .build();
-    }
-
     @GetMapping("/vnpay-return")
-    public ResponseDto<PaymentResponse> handleVNPayReturn(HttpServletRequest request) {
+    public ResponseDto<PaymentDto> handleVNPayReturn(HttpServletRequest request) {
         try {
-            PaymentResponse result = paymentService.handleVNPayReturn(request);
-            return ResponseDto.<PaymentResponse>builder()
+            PaymentDto result = paymentService.handleVNPayReturn(request);
+            return ResponseDto.<PaymentDto>builder()
                     .message("Payment processed successfully")
                     .data(result)
                     .status(HttpStatus.OK.value())
                     .build();
         } catch (Exception e) {
-            return ResponseDto.<PaymentResponse>builder()
+            return ResponseDto.<PaymentDto>builder()
                     .message("Error processing payment: " + e.getMessage())
                     .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .build();
         }
+    }
+
+    @GetMapping("/vnpay/url")
+    public ResponseDto<Object> getPaymentUrl(@RequestBody CreatePaymentRequest createPaymentRequest) {
+
+        CreatePaymentResponse paymentUrl = paymentService.getPaymentUrl(createPaymentRequest);
+
+        return ResponseDto.builder()
+                .message("Payment processed successfully")
+                .data(paymentUrl)
+                .status(HttpStatus.OK.value())
+                .build();
     }
 }
