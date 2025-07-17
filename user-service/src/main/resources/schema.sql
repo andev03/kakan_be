@@ -36,7 +36,7 @@ CREATE TABLE account (
   email       VARCHAR(255)     NOT NULL UNIQUE,
   password    VARCHAR(255)     NOT NULL,
   is_active   BOOLEAN          NOT NULL DEFAULT TRUE,
-  role        VARCHAR(50)     NOT NULL,
+  role        VARCHAR(10)     NOT NULL,
   create_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
