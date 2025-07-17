@@ -51,7 +51,7 @@ public class AuthenticationController {
         }
         try{
             authenticationService.register(account);
-            return new ResponseDto<String>(200, "Đăng ký thành công", "Vui lòng đăng nhập để tiếp tục");
+            return new ResponseDto<String>(HttpStatus.OK.value(), "Đăng ký thành công", "Vui lòng đăng nhập để tiếp tục");
 
         }catch (IllegalArgumentException e) {
             return new ResponseDto<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
@@ -75,7 +75,7 @@ public class AuthenticationController {
     public ResponseDto<AccountResponse> login(@RequestBody LoginRequest request){
         try{
             AccountResponse accountResponse = accountService.login(request);
-            return  new ResponseDto<>(200, "Đăng nhập thành công", accountResponse);
+            return  new ResponseDto<>(HttpStatus.OK.value(), "Đăng nhập thành công", accountResponse);
         }catch (NotFoundException e) {
             return new ResponseDto<>(HttpStatus.NOT_FOUND.value(), e.getMessage(), null);
         } catch (EntityNotFoundException e) {
