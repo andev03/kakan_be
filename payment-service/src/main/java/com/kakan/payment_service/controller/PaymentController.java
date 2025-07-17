@@ -6,6 +6,7 @@ import com.kakan.payment_service.dto.response.PaymentDto;
 import com.kakan.payment_service.dto.response.ResponseDto;
 import com.kakan.payment_service.service.impl.PaymentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +19,17 @@ public class PaymentController {
     private PaymentServiceImpl paymentService;
 
     @GetMapping("/vnpay-return")
-    public ResponseDto<PaymentDto> handleVNPayReturn(HttpServletRequest request) {
+    public ResponseDto<PaymentDto> handleVNPayReturn(HttpServletRequest request , HttpServletResponse response) {
         try {
             PaymentDto result = paymentService.handleVNPayReturn(request);
+            String redirectUrl = "http://localhost:5173/vnpay/success"
+                    + "?paymentId=" + result.getPaymentId()
+                    + "&orderId=" + result.getOrderId()
+                    + "&accountId=" + result.getAccountId()
+                    + "&status=" + result.getStatus()
+                    + "&amount=" + result.getAmount();
+
+            response.sendRedirect(redirectUrl);
             return ResponseDto.<PaymentDto>builder()
                     .message("Payment processed successfully")
                     .data(result)

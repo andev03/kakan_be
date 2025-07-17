@@ -80,7 +80,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
-        String vnp_TxnRef = order.getOrderId() + "";
+        String vnp_TxnRef = order.getOrderId() + "-" + UUID.randomUUID().toString().substring(0, 6);
         String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
         String vnp_OrderType = "other";
         String vnp_IpAddr = "127.0.0.1";
@@ -158,11 +158,13 @@ public class PaymentServiceImpl implements PaymentService {
                 fields.put(fieldName, fieldValue);
             }
         }
-        String orderId = (String) fields.get("vnp_TxnRef");
+        String vnp_TxnRef = (String) fields.get("vnp_TxnRef");
 
-        int order = Integer.parseInt(orderId);
+        String[] parts = vnp_TxnRef.split("-");
+        int orderId = Integer.parseInt(parts[0]);
 
-        Payment payment = paymentRepository.findByOrderId(order);
+        System.out.println("Order ID: " + orderId);
+        Payment payment = paymentRepository.findByOrderId(orderId);
 
         payment.setStatus(PaymentEnums.SUCCESS.name());
         payment.setPaymentUrl(null);
