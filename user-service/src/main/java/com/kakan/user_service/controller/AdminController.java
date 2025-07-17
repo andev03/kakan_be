@@ -40,12 +40,12 @@ public class AdminController {
     @PutMapping("/block-user/{id}")
     public ResponseDto blockUser(@PathVariable int id) {
         adminService.blockUser(id);
-        return new ResponseDto<>(200, "User blocked successfully", null);
+        return new ResponseDto<>(200, "Chặn người dùng thành công", null);
     }
 
     @PutMapping("/active-user/{id}")
     public ResponseDto activeUser(@PathVariable int id) {
         adminService.activeUser(id);
-        return new ResponseDto<>(200, "User is active", null);
+        return new ResponseDto<>(200, "Người dùng đã được kích hoạt", null);
     }
 }

@@ -39,9 +39,6 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/loginByGoogle",
             "/oauth2/authorization/**",
             "/login/oauth2/code/**",
-            "/api/forgot-password",
-            "/api/reset-password",
-            "/api/validate-otp",
             "/api/vnpay-return"
     );
 
