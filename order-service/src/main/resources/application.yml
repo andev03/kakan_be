@@ -9,7 +9,7 @@ spring:
     password: 12345
   main:
     banner-mode: off
-    lazy-initialization: true
+
   jpa:
     properties:
       hibernate:
@@ -21,20 +21,14 @@ spring:
       mode: always
   kafka:
     bootstrap-servers: localhost:9092
+    consumer:
+      group-id: orders-kakan-group
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    consumer:
-      group-id: orders-kakan-group
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 logging:
   level:
-    org.springframework.kafka: DEBUG
-    org.apache.kafka.clients.producer.KafkaProducer: TRACE
-    org.springframework.kafka.listener: DEBUG
-    org.apache.kafka.clients.consumer: TRACE
     root: warn
     org:
       hibernate:

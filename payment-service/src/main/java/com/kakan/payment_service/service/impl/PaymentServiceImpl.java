@@ -4,18 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakan.payment_service.config.VNPayConfig;
 import com.kakan.payment_service.dto.OrderCreatedEvent;
+import com.kakan.payment_service.dto.PaymentEvent;
 import com.kakan.payment_service.dto.request.CreatePaymentRequest;
 import com.kakan.payment_service.dto.response.CreatePaymentResponse;
-import com.kakan.payment_service.dto.response.PaymentResponse;
+import com.kakan.payment_service.dto.response.PaymentDto;
 import com.kakan.payment_service.enums.PaymentEnums;
+import com.kakan.payment_service.mapper.PaymentMapper;
 import com.kakan.payment_service.pojo.Payment;
 import com.kakan.payment_service.repository.PaymentRepository;
 import com.kakan.payment_service.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -27,6 +29,7 @@ import java.util.*;
 
 import static com.kakan.payment_service.config.VNPayConfig.secretKey;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
@@ -35,11 +38,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final ObjectMapper objectMapper;
 
+    private final PaymentMapper paymentMapper;
+
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
     @KafkaListener(topics = "order.success", groupId = "orders-kakan-group")
     public void handleOrderEvent(String orderString) throws JsonProcessingException {
 
         OrderCreatedEvent order = objectMapper.readValue(orderString, OrderCreatedEvent.class);
-
         Payment payment = new Payment();
         payment.setOrderId(order.getOrderId());
         payment.setAccountId(order.getAccountId());
@@ -53,18 +59,21 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public CreatePaymentResponse getPaymentUrl(CreatePaymentRequest createPaymentRequest) {
+        Payment payment = paymentRepository.findByOrderId(createPaymentRequest.getOrderId());
+
         return CreatePaymentResponse.builder()
                 .message("Lấy URL thanh toán thành công")
                 .paymentUrl(
                         getPaymentUrl(new OrderCreatedEvent(
                                 createPaymentRequest.getOrderId(),
                                 createPaymentRequest.getAccountId(),
-                                createPaymentRequest.getAmount()
+                                payment.getAmount(),
+                                "PENDING"
                         )))
                 .build();
     }
 
-    private String getPaymentUrl(OrderCreatedEvent order){
+    private String getPaymentUrl(OrderCreatedEvent order) {
         BigDecimal rawAmount = BigDecimal.valueOf(order.getAmount()).multiply(BigDecimal.valueOf(100));
         long amount = rawAmount.longValue();
 
@@ -137,8 +146,9 @@ public class PaymentServiceImpl implements PaymentService {
 
         return VNPayConfig.vnp_PayUrl + "?" + queryUrl;
     }
+
     @Override
-    public PaymentResponse handleVNPayReturn(HttpServletRequest request) {
+    public PaymentDto handleVNPayReturn(HttpServletRequest request) throws JsonProcessingException {
         Map fields = new HashMap();
         for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
             String fieldName = (String) params.nextElement();
@@ -147,20 +157,24 @@ public class PaymentServiceImpl implements PaymentService {
                 fields.put(fieldName, fieldValue);
             }
         }
+        String orderId = (String) fields.get("vnp_TxnRef");
 
-        String vnp_SecureHash = (String) fields.remove("vnp_SecureHash");
-        if (secretKey != null && VNPayConfig.hashAllFields(fields).equals(vnp_SecureHash)) {
-            String vnp_ResponseCode = (String) fields.get("vnp_ResponseCode");
-            String vnp_TransactionStatus = (String) fields.get("vnp_TransactionStatus");
-            String vnp_TxnRef = (String) fields.get("vnp_TxnRef");
-            String vnp_OrderInfo = (String) fields.get("vnp_OrderInfo");
-            long amountFromVNPAY = Long.parseLong((String) fields.get("vnp_Amount"));
-            Double amount = amountFromVNPAY / 100.0;
+        int order = Integer.parseInt(orderId);
 
-            Integer orderId = Integer.parseInt(vnp_TxnRef);
+        Payment payment = paymentRepository.findByOrderId(order);
 
-        }
+        payment.setStatus(PaymentEnums.SUCCESS.name());
+        payment.setPaymentUrl(null);
+        payment.setResponseMessage("Thanh toán thành công");
 
-        return null;
+        payment = paymentRepository.save(payment);
+
+        PaymentEvent paymentEvent = new PaymentEvent();
+        paymentEvent.setOrderId(payment.getOrderId());
+        paymentEvent.setPaymentStatus(payment.getStatus());
+
+        kafkaTemplate.send("payment.success", objectMapper.writeValueAsString(paymentEvent));
+
+        return paymentMapper.toDto(payment);
     }
 }

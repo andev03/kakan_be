@@ -9,12 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderCreatedEvent {
+public class PaymentEvent {
     private Integer orderId;
 
-    private Integer accountId;
-
-    private Double amount;
-
-    private String status;
+    private String paymentStatus;
 }

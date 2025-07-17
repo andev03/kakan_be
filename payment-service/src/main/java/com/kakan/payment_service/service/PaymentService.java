@@ -1,12 +1,13 @@
 package com.kakan.payment_service.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.kakan.payment_service.dto.request.CreatePaymentRequest;
 import com.kakan.payment_service.dto.response.CreatePaymentResponse;
-import com.kakan.payment_service.dto.response.PaymentResponse;
+import com.kakan.payment_service.dto.response.PaymentDto;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface PaymentService {
 
     CreatePaymentResponse getPaymentUrl(CreatePaymentRequest createPaymentRequest);
-    PaymentResponse handleVNPayReturn(HttpServletRequest request);
+    PaymentDto handleVNPayReturn(HttpServletRequest request) throws JsonProcessingException;
 }
