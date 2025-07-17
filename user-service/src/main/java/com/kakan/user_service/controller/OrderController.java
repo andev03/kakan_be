@@ -1,0 +1,22 @@
+package com.kakan.user_service.controller;
+
+import com.kakan.user_service.dto.request.OrderStatusRequest;
+import com.kakan.user_service.dto.response.ResponseDto;
+import com.kakan.user_service.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api")
+public class OrderController {
+    @Autowired
+    private OrderService orderService;
+    @GetMapping("/updateRole")
+    public ResponseDto updateRole(OrderStatusRequest orderStatusRequest) {
+        orderService.updateRole(orderStatusRequest);
+        return new ResponseDto(HttpStatus.OK.value(), "Role updated successfully", null);
+    }
+}
