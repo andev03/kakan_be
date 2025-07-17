@@ -27,5 +27,5 @@ public class ViewUserInformationResponse {
 
     private Double gpa;
 
-
+    private String email;
 }

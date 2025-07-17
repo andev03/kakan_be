@@ -113,6 +113,7 @@ public class UserInformationServiceImpl implements UserInformationService {
                 .address(userInformation.getAddress())
                 .avatarUrl(userInformation.getAvatarUrl())
                 .gpa(userInformation.getGpa())
+                .email(account.getEmail())
                 .build();
     }
 
