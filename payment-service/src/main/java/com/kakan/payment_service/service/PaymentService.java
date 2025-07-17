@@ -8,6 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public interface PaymentService {
 
-    CreatePaymentResponse getPaymentUrl(CreatePaymentRequest createPaymentRequest);
+    CreatePaymentResponse getPaymentUrl(Integer accountId, Integer orderId);
     PaymentDto handleVNPayReturn(HttpServletRequest request) throws JsonProcessingException;
 }
