@@ -173,7 +173,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentResponse vnPayReturn(HttpServletRequest request) {
+    public PaymentResponse handleVNPayReturn(HttpServletRequest request) {
 
 
 
