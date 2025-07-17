@@ -1,9 +1,9 @@
 package com.kakan.order_service.service;
 
-import com.kakan.order_service.dto.CustomerOrder;
-import com.kakan.order_service.pojo.Order;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.kakan.order_service.dto.OrderResponseDto;
+import com.kakan.order_service.dto.request.OrderRequestDto;
 
 public interface OrderService {
-    Order createOrder(CustomerOrder customerOrder) ;
-
+    OrderResponseDto createOrder(OrderRequestDto orderRequestDto) throws JsonProcessingException;
 }

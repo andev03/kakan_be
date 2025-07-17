@@ -1,6 +1,5 @@
 package com.kakan.payment_service.pojo;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,8 +30,7 @@ public class Payment {
     private String paymentMethod;
 
     @Column(name = "payment_date", nullable = false)
-    private OffsetDateTime paymentDate;
-
+    private OffsetDateTime paymentDate = OffsetDateTime.now();
 
     @Column(nullable = false, length = 10)
     private String status;
@@ -40,4 +38,6 @@ public class Payment {
     @Column(name = "response_message", columnDefinition = "TEXT")
     private String responseMessage;
 
+    @Column(name = "payment_url", columnDefinition = "TEXT")
+    private String paymentUrl;
 }
