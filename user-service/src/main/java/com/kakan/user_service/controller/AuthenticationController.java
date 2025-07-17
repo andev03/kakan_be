@@ -10,6 +10,7 @@ import com.kakan.user_service.service.AccountService;
 import com.kakan.user_service.service.impl.AuthenticationServiceImpl;
 import com.netflix.discovery.converters.Auto;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.net.http.HttpResponse;
 
 @RestController
 @RequestMapping("/api")
@@ -90,4 +94,10 @@ public class AuthenticationController {
         authenticationService.logout(token);
         return ResponseEntity.ok("Đăng xuất thành công.");
     }
+
+
+//    @PostMapping("/login/google")
+//    public void loginGoogle(HttpServletResponse response) throws IOException {
+//        response.sendRedirect("http://localhost:8003/oauth2/authorization/google");
+//    }
 }

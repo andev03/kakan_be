@@ -57,7 +57,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/login", "/api/register", "/api/loginByGoogle",
                                 "/oauth2/authorization/**", "/login/oauth2/code/**",
-                                "/api/forgot-password", "/api/reset-password", "/api/validate-otp",
                                 "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/api/vnpay-return").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
@@ -90,7 +89,9 @@ public class SecurityConfig {
 
             if (accountResponse == null) {
                 // Nếu tài khoản bị vô hiệu hóa, chuyển hướng với thông báo lỗi
-                String redirectUrl = "https://nguyenhoangan.site/login/success?error=disabled";
+//                String redirectUrl = "https://nguyenhoangan.site/login/success?error=disabled";
+                String redirectUrl = "http://localhost:5173/login/success?error=disabled";
+
                 response.sendRedirect(redirectUrl);
                 return;
             }
@@ -100,7 +101,9 @@ public class SecurityConfig {
             String encodedUsername = URLEncoder.encode(accountResponse.getUserName(), "UTF-8");
             String role = URLEncoder.encode(accountResponse.getRole(), "UTF-8");
 
-            String redirectUrl = "https://nguyenhoangan.site/login/success?token=" +
+//            String redirectUrl = "https://nguyenhoangan.site/login/success?token=" +
+//                    encodedToken + "&username=" + encodedUsername + "&role=" + role;
+            String redirectUrl = "http://localhost:5173/login/success?token=" +
                     encodedToken + "&username=" + encodedUsername + "&role=" + role;
             response.sendRedirect(redirectUrl);
 
