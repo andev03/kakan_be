@@ -35,6 +35,18 @@ spring:
                 - Path=/forum/**
               filters:
                 - StripPrefix=1
+            - id: order-service
+              uri: lb://ORDER-SERVICE
+              predicates:
+                - Path=/forum/**
+              filters:
+                - StripPrefix=1
+            - id: payment-service
+              uri: lb://PAYMENT-SERVICE
+              predicates:
+                - Path=/forum/**
+              filters:
+                - StripPrefix=1
           globalcors:
             cors-configurations:
               '[/**]':

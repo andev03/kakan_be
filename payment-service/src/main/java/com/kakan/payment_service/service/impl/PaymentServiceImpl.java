@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -58,15 +59,15 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public CreatePaymentResponse getPaymentUrl(CreatePaymentRequest createPaymentRequest) {
-        Payment payment = paymentRepository.findByOrderId(createPaymentRequest.getOrderId());
+    public CreatePaymentResponse getPaymentUrl(Integer accountId, Integer orderId) {
+        Payment payment = paymentRepository.findByOrderId(orderId);
 
         return CreatePaymentResponse.builder()
                 .message("Lấy URL thanh toán thành công")
                 .paymentUrl(
                         getPaymentUrl(new OrderCreatedEvent(
-                                createPaymentRequest.getOrderId(),
-                                createPaymentRequest.getAccountId(),
+                                orderId,
+                                accountId,
                                 payment.getAmount(),
                                 "PENDING"
                         )))

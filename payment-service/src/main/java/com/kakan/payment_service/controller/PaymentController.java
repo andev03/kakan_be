@@ -8,10 +8,7 @@ import com.kakan.payment_service.service.impl.PaymentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -37,10 +34,10 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/vnpay/url")
-    public ResponseDto<Object> getPaymentUrl(@RequestBody CreatePaymentRequest createPaymentRequest) {
+    @GetMapping("/vnpay/url/{accountId}/{orderId}")
+    public ResponseDto<Object> getPaymentUrl(@PathVariable Integer accountId, @PathVariable Integer orderId) {
 
-        CreatePaymentResponse paymentUrl = paymentService.getPaymentUrl(createPaymentRequest);
+        CreatePaymentResponse paymentUrl = paymentService.getPaymentUrl(accountId, orderId);
 
         return ResponseDto.builder()
                 .message("Payment processed successfully")
