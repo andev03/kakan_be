@@ -38,13 +38,13 @@ spring:
             - id: order-service
               uri: lb://ORDER-SERVICE
               predicates:
-                - Path=/forum/**
+                - Path=/order/**
               filters:
                 - StripPrefix=1
             - id: payment-service
               uri: lb://PAYMENT-SERVICE
               predicates:
-                - Path=/forum/**
+                - Path=/payment/**
               filters:
                 - StripPrefix=1
           globalcors:
