@@ -18,7 +18,8 @@ public class OrderServiceImpl implements OrderService {
         // For example, if the order status is "COMPLETED", update the user's role to "PREMIUM"
         Account account = accountRepository.findAccountById(orderStatusRequest.getAccountId());
         if(orderStatusRequest.getStatus().equals("SUCCESS")) {
-            account.setRole("PREMIUM"); // or any other role based on your logic
+            account.setRole("PREMIUM");
+            accountRepository.save(account);// or any other role based on your logic
         }
     }
 }
