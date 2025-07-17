@@ -8,17 +8,19 @@ import com.kakan.order_service.dto.request.OrderRequestDto;
 import com.kakan.order_service.pojo.Order;
 import com.kakan.order_service.repository.OrderRepository;
 import com.kakan.order_service.service.OrderService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
 
-    private KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    private final ObjectMapper objectMapper;
 
     @Override
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) throws JsonProcessingException {
@@ -30,8 +32,7 @@ public class OrderServiceImpl implements OrderService {
         orderCreatedEvent.setAmount(savedOrder.getPrice());
         orderCreatedEvent.setStatus(savedOrder.getStatus());
 
-        kafkaTemplate.send("order.success", orderCreatedEvent);
-
+        kafkaTemplate.send("order.success", objectMapper.writeValueAsString(orderCreatedEvent));
         return OrderResponseDto.builder()
                 .orderId(orderCreatedEvent.getOrderId())
                 .accountId(orderCreatedEvent.getAccountId())

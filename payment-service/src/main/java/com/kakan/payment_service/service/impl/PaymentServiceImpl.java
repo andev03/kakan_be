@@ -1,5 +1,7 @@
 package com.kakan.payment_service.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakan.payment_service.config.VNPayConfig;
 import com.kakan.payment_service.dto.OrderCreatedEvent;
 import com.kakan.payment_service.dto.request.CreatePaymentRequest;
@@ -10,6 +12,7 @@ import com.kakan.payment_service.pojo.Payment;
 import com.kakan.payment_service.repository.PaymentRepository;
 import com.kakan.payment_service.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -24,16 +27,19 @@ import java.util.*;
 
 import static com.kakan.payment_service.config.VNPayConfig.secretKey;
 
-@Slf4j
 @Service
+@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    @Autowired
-    private PaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
+
+    private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "order.success", groupId = "orders-kakan-group")
-    public void handleOrderEvent(OrderCreatedEvent order) {
-        log.info("Nhận OrderCreatedEvent: {}", order);
+    public void handleOrderEvent(String orderString) throws JsonProcessingException {
+
+        OrderCreatedEvent order = objectMapper.readValue(orderString, OrderCreatedEvent.class);
+
         Payment payment = new Payment();
         payment.setOrderId(order.getOrderId());
         payment.setAccountId(order.getAccountId());
