@@ -90,3 +90,6 @@ grpc:
     port: 9090
     security:
       enabled: false
+
+frontend:
+  url: http://localhost:5173

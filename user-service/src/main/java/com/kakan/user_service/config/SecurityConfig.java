@@ -5,6 +5,7 @@ import com.kakan.user_service.service.impl.AccountServiceImpl;
 import com.kakan.user_service.service.impl.AuthenticationServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -47,8 +48,10 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
-    @Autowired
-    ObjectMapper objectMapper;
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -90,7 +93,7 @@ public class SecurityConfig {
             if (accountResponse == null) {
                 // Nếu tài khoản bị vô hiệu hóa, chuyển hướng với thông báo lỗi
 //                String redirectUrl = "https://nguyenhoangan.site/login/success?error=disabled";
-                String redirectUrl = "http://localhost:5173/login/success?error=disabled";
+                String redirectUrl = frontendUrl + "/login/success?error=disabled";
 
                 response.sendRedirect(redirectUrl);
                 return;
@@ -103,7 +106,7 @@ public class SecurityConfig {
 
 //            String redirectUrl = "https://nguyenhoangan.site/login/success?token=" +
 //                    encodedToken + "&username=" + encodedUsername + "&role=" + role;
-            String redirectUrl = "http://localhost:5173/login/success?token=" +
+            String redirectUrl = frontendUrl + "/login/success?token=" +
                     encodedToken + "&username=" + encodedUsername + "&role=" + role;
             response.sendRedirect(redirectUrl);
 
