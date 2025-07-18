@@ -16,9 +16,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Validated
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@RequestMapping("/api")
+
 public class UserInformationController {
 
     private final UserInformationService userInformationService;
@@ -28,17 +32,18 @@ public class UserInformationController {
         this.userInformationService = userInformationService;
     }
 
-    @PutMapping("/user/information")
-    public ResponseDto<UpdateUserInformationRequest> updateUserInformation(@RequestBody UpdateUserInformationRequest request) {
+    @PutMapping("/update/information")
+    public ResponseDto updateUserInformation(@ModelAttribute UpdateUserInformationRequest request) {
         try{
-            UpdateUserInformationRequest result = userInformationService.updateUserInformation(request);
-            return new ResponseDto<>(HttpStatus.OK.value(), "Cập nhật thông tin học sinh thành công.", result );
+             userInformationService.updateUserInformation(request);
+            return new ResponseDto<>(HttpStatus.OK.value(), "Cập nhật thông tin học sinh thành công.", null );
         }catch (DuplicateEntity e){
             return new ResponseDto<>(HttpStatus.CONFLICT.value(), e.getMessage(), null);
         } catch (RuntimeException e) {
             return  new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin học sinh.", null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
     @PostMapping("/uploadImage/{id}")

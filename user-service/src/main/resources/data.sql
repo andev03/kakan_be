@@ -10,7 +10,7 @@ INSERT INTO account (user_name, email, password, is_active, role)
 VALUES ('alice', 'alice@example.com', '$2a$12$FsEQT3Zw0PeNv7iW5jmsF.6BZ70WKzIkdpqThESAnE.G2FhgvVoy6', TRUE, 'STUDENT'),
        ('Bob', 'bob@example.com', '$2a$12$hgpOZw7bTi1Ky796XgJDMOsjh4oWeSRkaHVn71EgeO1xc4rA/TeGG', TRUE, 'STUDENT'),
        ('Nhat An', 'nhatan@example.com', '$2a$12$s0oTQbQkFQvW96GtQBsFbunQ7SkfqYikaw9LuLZp3Sq1QhYniVnJu', TRUE,
-        'STUDENT'),
+        'PREMIUM'),
        ('Admin', 'admin@mysite.com', '$2a$12$F9xihGUaaA9eyKkdAOVwwOhUZkzEjQP0WzbR8HCUWraeE/7.fLIci', TRUE, 'ADMIN');
 
 -- user_information
@@ -18,7 +18,7 @@ INSERT INTO user_information (account_id, full_name, gender, dob, phone, address
 VALUES (1, 'Alice Nguyen', FALSE, '2005-03-15', '0123456789', '123 Đường A, Quận 1, TP.HCM',
         'https://example.com/avatar/alice.jpg'),
        (2, 'Bob Tran', TRUE, '1985-10-20', '0987654321', '456 Đường B, Quận 3, TP.HCM', NULL),
-       (3, 'Nguyen Hoang Nhat An', TRUE, '2004-08-20', '0901922117', '789 Đường C, Quận 5, TP.HCM',
+       (3, 'Nguyen Hoang Nhat An', TRUE, '2004-08-20', '0901922118', '789 Đường C, Quận 5, TP.HCM',
         'https://example.com/avatar/nhatan.jpg');
 
 -- subject

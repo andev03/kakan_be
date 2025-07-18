@@ -2,14 +2,14 @@ server:
   port: 8004
 spring:
   application:
-    name: admission-advisor-service
+    name: order-service
   datasource:
     url: jdbc:postgresql://localhost:5432/order_service_db
     username: postgres
     password: 12345
   main:
     banner-mode: off
-    lazy-initialization: true
+
   jpa:
     properties:
       hibernate:
@@ -19,6 +19,13 @@ spring:
   sql:
     init:
       mode: always
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: orders-kakan-group
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 logging:
   level:

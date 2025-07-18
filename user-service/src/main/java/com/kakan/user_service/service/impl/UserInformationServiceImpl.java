@@ -11,7 +11,8 @@ import com.kakan.user_service.repository.AccountRepository;
 import com.kakan.user_service.repository.UserInformationRepository;
 import com.kakan.user_service.service.UserInformationService;
 import com.kakan.user_service.util.FileUpLoadUtil;
-import lombok.Builder;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.mock.web.MockMultipartFile;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.Objects;
 
 
@@ -43,7 +46,7 @@ public class UserInformationServiceImpl implements UserInformationService {
 
     @Override
     @Transactional
-    public UpdateUserInformationRequest updateUserInformation(UpdateUserInformationRequest request) {
+    public void updateUserInformation(UpdateUserInformationRequest request) {
         try{
             Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             UserInformation userInformation = userInformationRepository.findByAccountId(account.getId());
@@ -64,18 +67,24 @@ public class UserInformationServiceImpl implements UserInformationService {
             if (request.getAddress() != null && !Objects.equals(request.getAddress(), userInformation.getAddress())) {
                 userInformation.setAddress(request.getAddress());
             }
+
+            if (request.getGender() != null && !Objects.equals(request.getGender(), userInformation.getGender())) {
+                userInformation.setGender(Boolean.parseBoolean(request.getGender()));
+            }
+            if (request.getDob() != null && !Objects.equals(request.getDob(), userInformation.getDob())) {
+                userInformation.setDob(request.getDob());
+            }
             // Xử lý upload ảnh nếu có
             if (request.getAvatarUrl() != null && !request.getAvatarUrl().isEmpty()) {
-                uploadImage(account.getId(), request.getAvatarUrl());
+               // MultipartFile file = decodeBase64ToMultipartFile(request.getAvatarBase64());
+                uploadImage(account.getId(),request.getAvatarUrl());
             }
             userInformationRepository.save(userInformation);
-            return modelMapper.map(userInformation, UpdateUserInformationRequest.class);
         }catch (DuplicateEntity e) {
             throw new DuplicateEntity(e.getMessage());
         } catch (RuntimeException e) {
             throw new RuntimeException("Đã xảy ra lỗi trong quá trình cập nhật thông tin học sinh.");
         }
-
     }
 
     @Transactional
@@ -104,8 +113,36 @@ public class UserInformationServiceImpl implements UserInformationService {
                 .address(userInformation.getAddress())
                 .avatarUrl(userInformation.getAvatarUrl())
                 .gpa(userInformation.getGpa())
+                .email(account.getEmail())
                 .build();
     }
 
+    private MultipartFile decodeBase64ToMultipartFile(String dataUri) throws IOException {
+        // dataUri ví dụ "data:image/png;base64,...."
+        String[] parts = dataUri.split(",");
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("Invalid Base64 data URI format");
+        }
 
+        // metadata: "data:image/png;base64"
+        String metadata = parts[0];
+        String base64Data = parts[1];
+
+        // lấy content-type
+        String contentType = metadata.substring(
+                metadata.indexOf(":") + 1,
+                metadata.indexOf(";")
+        );
+
+        // giải mã
+        byte[] fileBytes = Base64.getDecoder().decode(base64Data);
+
+        // suy ra extension từ content-type
+        String ext = contentType.substring(contentType.indexOf("/") + 1);
+
+        // đặt tên file (có thể customize lại)
+        String fileName = "avatar." + ext;
+
+        return new MockMultipartFile("avatar", fileName, contentType, fileBytes);
+    }
 }

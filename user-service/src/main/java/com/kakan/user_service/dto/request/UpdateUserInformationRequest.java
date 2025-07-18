@@ -24,6 +24,9 @@ public class UpdateUserInformationRequest {
 
     private String address;
 
+    private String gender;
+    private LocalDate dob;
+
     private MultipartFile avatarUrl;
 
 }

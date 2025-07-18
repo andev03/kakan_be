@@ -36,7 +36,7 @@ CREATE TABLE account (
   email       VARCHAR(255)     NOT NULL UNIQUE,
   password    VARCHAR(255)     NOT NULL,
   is_active   BOOLEAN          NOT NULL DEFAULT TRUE,
-  role        VARCHAR(50)     NOT NULL,
+  role        VARCHAR(10)     NOT NULL,
   create_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
@@ -45,8 +45,8 @@ CREATE TABLE user_information (
   user_id     SERIAL           PRIMARY KEY,
   account_id  INTEGER          NOT NULL REFERENCES account(id) ON DELETE CASCADE,
   full_name   VARCHAR(50)      NOT NULL,
-  gender      BOOLEAN          NOT NULL,
-  dob         DATE             NOT NULL,
+  gender      BOOLEAN        ,
+  dob         DATE          ,
   phone       VARCHAR(20),
   address     TEXT,
   gpa           NUMERIC(4,2),
