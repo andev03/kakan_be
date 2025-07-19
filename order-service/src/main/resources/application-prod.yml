@@ -20,15 +20,6 @@ spring:
     init:
       mode: always
 
-logging:
-  level:
-    root: warn
-    org:
-      hibernate:
-        SQL: trace
-        orm:
-          jdbc:
-            bind: trace
 
 springdoc:
   swagger-ui:

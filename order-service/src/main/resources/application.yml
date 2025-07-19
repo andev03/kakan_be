@@ -27,15 +27,6 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-logging:
-  level:
-    root: warn
-    org:
-      hibernate:
-        SQL: trace
-        orm:
-          jdbc:
-            bind: trace
 
 springdoc:
   swagger-ui:
