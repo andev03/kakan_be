@@ -108,6 +108,7 @@ public class SecurityConfig {
                     encodedToken + "&username=" + encodedUsername + "&role=" + role + "id=" + encodedId;
 //            String redirectUrl = frontendUrl + "/login/success?token=" +
 //                    encodedToken + "&username=" + encodedUsername + "&role=" + role + "id=" + encodedId;
+            response.sendRedirect(redirectUrl);
 
 //            Map<String, String> tokenMap = new HashMap<>();
 //            tokenMap.put("access_token", accountResponse.getToken());
