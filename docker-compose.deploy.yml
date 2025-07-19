@@ -20,19 +20,6 @@ services:
       timeout: 5s
       retries: 5
 
-  mongo:
-    image: mongo:6.0
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    networks:
-      - backend
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   eureka:
     image: andev368/eureka:latest
     container_name: eureka
