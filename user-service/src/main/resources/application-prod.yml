@@ -1,0 +1,82 @@
+server:
+  port: 8003
+spring:
+  application:
+    name: user-service
+  security:
+    user:
+      name: user
+      password: 12345
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 900209106788-hfec1pa7dnh1enpbptlaenngudlsamen.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - openid
+              - profile
+              - email
+            redirect-uri: "https://kakan-be.nguyenhoangan.site/user/login/oauth2/code/google"
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
+            user-name-attribute: sub
+  datasource:
+    url: jdbc:postgresql://postgres:5432/user_service_db
+    username: postgres
+    password: 12345
+  main:
+    banner-mode: off
+    lazy-initialization: true
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+  sql:
+    init:
+      mode: always
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+
+logging:
+  level:
+    root: warn
+    org:
+      hibernate:
+        SQL: trace
+        orm:
+          jdbc:
+            bind: trace
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    path: /api
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://eureka:8070/eureka/
+
+grpc:
+  server:
+    port: 9090
+    security:
+      enabled: false
+
+vnpay:
+  host: https://kakan-be.nguyenhoangan.site/user
+
+frontend:
+  url: https://nguyenhoangan.site

@@ -1,0 +1,26 @@
+server:
+  port: 8002
+spring:
+  application:
+    name: school-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/university_service_db
+      database: universityDB
+  main:
+    banner-mode: off
+    lazy-initialization: true
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    path: /api
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/

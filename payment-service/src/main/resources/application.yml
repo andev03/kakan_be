@@ -1,0 +1,49 @@
+server:
+  port: 8005
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment_service_db
+    username: postgres
+    password: 12345
+  main:
+    banner-mode: off
+
+  jpa:
+    properties:
+      hibernate:
+        ddl-auto: none
+        format_sql: true
+    show-sql: true
+  sql:
+    init:
+      mode: always
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: payments-kakan-group
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    path: /api
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
+
+vnpay:
+  host: http://localhost:8005
+
+fe:
+  host: http://localhost:5173

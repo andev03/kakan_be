@@ -1,0 +1,95 @@
+name: Deploy Microservices with Docker Compose
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Generate UUID as version tag
+        id: uuid
+        run: echo "TAG=$(uuidgen)" >> $GITHUB_ENV
+
+      - name: Replace :latest with UUID tag in build file
+        run: sed -i "s/:latest/:$TAG/g" docker-compose.build.yml
+
+      - name: Build all images using Docker Compose
+        run: docker compose -f docker-compose.build.yml build
+
+      - name: Push all images using Docker Compose
+        run: docker compose -f docker-compose.build.yml push
+
+      - name: Replace :latest with UUID tag in deploy file
+        run: sed -i "s/:latest/:$TAG/g" docker-compose.deploy.yml
+
+      - name: Upload init-db folder to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: kakan
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "init-db"
+          target: "/home/kakan/microservices"
+
+      - name: Upload docker-compose.deploy.yml to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: kakan
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "docker-compose.deploy.yml"
+          target: "/home/kakan/microservices"
+
+      - name: Stop and remove containers + volume
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: kakan
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /home/kakan/microservices
+            docker compose -f docker-compose.deploy.yml down -v || true
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: kakan
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /home/kakan/microservices
+            docker compose -f docker-compose.deploy.yml pull
+            docker compose -f docker-compose.deploy.yml up -d --remove-orphans
+            docker image prune -af
+
+      - name: Notify Slack on Success
+        if: success()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": ":rocket: Deployment back-end tag: ${{ env.TAG }} Successful!"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": ":boom: Deployment back-end tag: ${{ env.TAG }} Failed!"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

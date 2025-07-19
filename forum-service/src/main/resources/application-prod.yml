@@ -1,0 +1,47 @@
+server:
+  port: 8001
+spring:
+  application:
+    name: forum-service
+  datasource:
+    url: jdbc:postgresql://postgres:5432/forum_service_db
+    username: postgres
+    password: 12345
+
+  main:
+    banner-mode: off
+    lazy-initialization: true
+  jpa:
+    properties:
+      hibernate:
+        "format_sql": true
+    show-sql: true
+  sql:
+    init:
+      mode: always
+logging:
+  level:
+    root: warn
+    org:
+      hibernate:
+        SQL: trace
+        orm:
+          jdbc:
+            bind: trace
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    path: /api
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://eureka:8070/eureka/
+
+grpc:
+  host: user-service
