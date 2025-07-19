@@ -15,4 +15,6 @@ public class OrderDto {
 
     private OffsetDateTime expiredDate;
 
+    private String status;
+
 }

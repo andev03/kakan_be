@@ -6,4 +6,6 @@ import com.kakan.user_service.pojo.Order;
 
 public interface OrderService {
     void updateRole(OrderStatusRequest orderStatusRequest) ;
+     void updateRoleStudent(OrderStatusRequest orderStatusRequest);
+
 }
