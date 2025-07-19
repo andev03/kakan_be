@@ -9,7 +9,6 @@ spring:
     password: 12345
   main:
     banner-mode: off
-    lazy-initialization: true
   jpa:
     properties:
       hibernate:
