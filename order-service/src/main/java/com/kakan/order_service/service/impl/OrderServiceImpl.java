@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static java.time.OffsetDateTime.now;
+
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -71,6 +73,8 @@ public class OrderServiceImpl implements OrderService {
         order.setAccountId(orderRequestDto.getAccountId());
         order.setPrice(orderRequestDto.getAmount());
         order.setStatus("PENDING");
+        order.setUpdatedAt(now());
+        order.setExpiredDate(now().plusDays(30)); // Assuming orders expire in 1 day
         return orderRepository.save(order);
     }
 
@@ -82,6 +86,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(payment.getOrderId()).orElseThrow(() -> new OrderNotFoundException(payment.getOrderId()));
 
         order.setStatus(payment.getPaymentStatus());
+        order.setUpdatedAt(now());
 
         orderRepository.save(order);
     }
