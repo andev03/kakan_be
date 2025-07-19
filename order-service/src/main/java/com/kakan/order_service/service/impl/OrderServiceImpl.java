@@ -15,6 +15,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -74,7 +76,9 @@ public class OrderServiceImpl implements OrderService {
         order.setPrice(orderRequestDto.getAmount());
         order.setStatus("PENDING");
         order.setUpdatedAt(now());
-        order.setExpiredDate(now().plusDays(30)); // Assuming orders expire in 1 day
+//        order.setExpiredDate(now().plusDays(30)); // Assuming orders expire in 1 day
+        order.setExpiredDate(now().plusMinutes(2)); // Assuming orders expire in 1 day
+
         return orderRepository.save(order);
     }
 
@@ -89,5 +93,16 @@ public class OrderServiceImpl implements OrderService {
         order.setUpdatedAt(now());
 
         orderRepository.save(order);
+    }
+
+    @Scheduled(fixedRate = 60_000)  // hàng ngày lúc 00:00
+    public void checkExpiredOrders() {
+        orderRepository.findAll().forEach(order -> {
+            if (order.getExpiredDate().isBefore(now()) && order.getStatus().equals("SUCCESS")) {
+                order.setStatus("EXPIRED");
+                order.setUpdatedAt(now());
+                orderRepository.save(order);
+            }
+        });
     }
 }
