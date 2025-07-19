@@ -94,3 +94,6 @@ grpc:
 
 frontend:
   url: http://localhost:5173
+
+vnpay:
+  host: http://localhost:8003

@@ -35,6 +35,8 @@ import static com.kakan.payment_service.config.VNPayConfig.secretKey;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
+    private final VNPayConfig vnPayConfig;
+
     private final PaymentRepository paymentRepository;
 
     private final ObjectMapper objectMapper;
@@ -96,7 +98,7 @@ public class PaymentServiceImpl implements PaymentService {
         vnp_Params.put("vnp_OrderType", vnp_OrderType);
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_BankCode", "NCB");
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ReturnUrl", vnPayConfig.getVnpReturnUrl());
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));

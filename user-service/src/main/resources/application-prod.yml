@@ -74,3 +74,6 @@ grpc:
     port: 9090
     security:
       enabled: false
+
+vnpay:
+  host: https://kakan-be.nguyenhoangan.site/user

@@ -1,6 +1,7 @@
 package com.kakan.payment_service.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import javax.crypto.Mac;
@@ -14,12 +15,18 @@ import java.util.*;
 
 @Configuration
 public class VNPayConfig {
+
+    @Value("${vnpay.host}")
+    String host;
+
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8005/api/vnpay-return";
     public static String vnp_TmnCode = "VOVJ5TZG";
     public static String secretKey = "8HDNHOIJ9M2K1SATF5HZY6W5U85HFSNV";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
+    public String getVnpReturnUrl() {
+        return host + "/api/vnpay-return";
+    }
 //    public static String md5(String message) {
 //        String digest = null;
 //        try {

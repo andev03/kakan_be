@@ -43,3 +43,9 @@ eureka:
     registerWithEureka: true
     serviceUrl:
       defaultZone: http://eureka:8070/eureka/
+
+vnpay:
+  host: https://kakan-be.nguyenhoangan.site/payment
+
+fe:
+  host: https://nguyenhoangan.site

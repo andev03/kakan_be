@@ -1,6 +1,5 @@
 package com.kakan.payment_service.controller;
 
-import com.kakan.payment_service.dto.request.CreatePaymentRequest;
 import com.kakan.payment_service.dto.response.CreatePaymentResponse;
 import com.kakan.payment_service.dto.response.PaymentDto;
 import com.kakan.payment_service.dto.response.ResponseDto;
@@ -8,13 +7,19 @@ import com.kakan.payment_service.service.impl.PaymentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
 public class PaymentController {
 
+    @Value("${fe.host}")
+    String host;
     @Autowired
     private PaymentServiceImpl paymentService;
 
@@ -22,7 +27,7 @@ public class PaymentController {
     public ResponseDto<PaymentDto> handleVNPayReturn(HttpServletRequest request , HttpServletResponse response) {
         try {
             PaymentDto result = paymentService.handleVNPayReturn(request);
-            String redirectUrl = "http://localhost:5173/vnpay/success"
+            String redirectUrl = host + "/vnpay/success"
                     + "?paymentId=" + result.getPaymentId()
                     + "&orderId=" + result.getOrderId()
                     + "&accountId=" + result.getAccountId()

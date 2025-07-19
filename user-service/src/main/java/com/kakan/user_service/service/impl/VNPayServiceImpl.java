@@ -90,7 +90,7 @@ public class VNPayServiceImpl implements VNPayService {
         vnp_Params.put("vnp_OrderType", vnp_OrderType); // Added missing parameter
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_BankCode", "NCB");
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ReturnUrl", vnPayConfig.getVnpReturnUrl());
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));

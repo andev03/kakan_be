@@ -49,8 +49,7 @@ public class SecurityConfig {
     private JwtFilter jwtFilter;
 
     @Value("${frontend.url}")
-    private String frontendUrl;
-
+    String frontendUrl;
 
 
     @Bean
@@ -99,7 +98,7 @@ public class SecurityConfig {
                 return;
             }
 
-             //Mã hóa các thông tin để gửi qua URL
+            //Mã hóa các thông tin để gửi qua URL
             String encodedToken = URLEncoder.encode(accountResponse.getToken(), "UTF-8");
             String encodedUsername = URLEncoder.encode(accountResponse.getUserName(), "UTF-8");
             String role = URLEncoder.encode(accountResponse.getRole(), "UTF-8");
@@ -107,6 +106,7 @@ public class SecurityConfig {
 //            String redirectUrl = "https://nguyenhoangan.site/login/success?token=" +
 //                    encodedToken + "&username=" + encodedUsername + "&role=" + role;
             String redirectUrl = frontendUrl + "/login/success?token=" +
+
                     encodedToken + "&username=" + encodedUsername + "&role=" + role;
             response.sendRedirect(redirectUrl);
 
