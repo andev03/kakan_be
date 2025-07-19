@@ -91,3 +91,6 @@ grpc:
     host: user-service
     security:
       enabled: false
+
+frontend:
+  url: http://localhost:5173
