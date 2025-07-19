@@ -77,3 +77,6 @@ grpc:
 
 vnpay:
   host: https://kakan-be.nguyenhoangan.site/user
+
+frontend:
+  url: https://nguyenhoangan.site
