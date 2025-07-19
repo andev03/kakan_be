@@ -21,4 +21,8 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     @Query("UPDATE Account a SET a.isActive = :isActive WHERE a.id = :id")
     void deactivateAccount(@Param("isActive") boolean isActive,@Param("id") Integer id);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE Account a SET a.role = :role WHERE a.id = :id")
+    int updateRoleById(@Param("id") Integer id, @Param("role") String role);
 }

@@ -1,8 +1,12 @@
 package com.kakan.user_service.dto.request;
 
-import lombok.Data;
+import lombok.*;
+import org.mapstruct.Mapping;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderStatusRequest {
     private int accountId;
     private String status;
