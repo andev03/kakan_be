@@ -103,11 +103,12 @@ public class SecurityConfig {
             String encodedToken = URLEncoder.encode(accountResponse.getToken(), "UTF-8");
             String encodedUsername = URLEncoder.encode(accountResponse.getUserName(), "UTF-8");
             String role = URLEncoder.encode(accountResponse.getRole(), "UTF-8");
+            String accountId = URLEncoder.encode(String.valueOf(accountResponse.getId()), "UTF-8");
 
 //            String redirectUrl = "https://nguyenhoangan.site/login/success?token=" +
 //                    encodedToken + "&username=" + encodedUsername + "&role=" + role;
             String redirectUrl = frontendUrl + "/login/success?token=" +
-                    encodedToken + "&username=" + encodedUsername + "&role=" + role;
+                    encodedToken +"&accountId=" + accountId + "&username=" + encodedUsername + "&role=" + role;
             response.sendRedirect(redirectUrl);
 
 //            Map<String, String> tokenMap = new HashMap<>();

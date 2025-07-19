@@ -5,15 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakan.order_service.dto.OrderCreatedEvent;
 import com.kakan.order_service.dto.OrderResponseDto;
 import com.kakan.order_service.dto.PaymentEvent;
+import com.kakan.order_service.dto.request.OrderDto;
 import com.kakan.order_service.dto.request.OrderRequestDto;
 import com.kakan.order_service.exception.OrderNotFoundException;
 import com.kakan.order_service.pojo.Order;
 import com.kakan.order_service.repository.OrderRepository;
 import com.kakan.order_service.service.OrderService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +49,21 @@ public class OrderServiceImpl implements OrderService {
                 .accountId(orderCreatedEvent.getAccountId())
                 .status(orderCreatedEvent.getStatus())
                 .build();
+    }
+
+    @Override
+    public OrderDto getOrderByAccountId(int accountId) {
+        Optional<Order> order = orderRepository.findByAccountId(accountId);
+        OrderDto orderDto = new OrderDto();
+        if (order.isPresent()) {
+            Order foundOrder = order.get();
+            orderDto.setOrderId(foundOrder.getOrderId());
+            orderDto.setOrderDate(foundOrder.getOrderDate());
+            orderDto.setExpiredDate(foundOrder.getExpiredDate());
+        } else {
+            throw new EntityNotFoundException("Order not found for account ID: " + accountId);
+        }
+        return orderDto;
     }
 
     private Order saveOrder(OrderRequestDto orderRequestDto) {
