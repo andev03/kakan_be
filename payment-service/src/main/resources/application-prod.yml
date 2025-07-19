@@ -2,7 +2,7 @@ server:
   port: 8005
 spring:
   application:
-    name: admission-advisor-service
+    name: payment-service
   datasource:
     url: jdbc:postgresql://postgres:5432/payment_service_db
     username: postgres
