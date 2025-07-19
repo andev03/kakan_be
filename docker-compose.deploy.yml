@@ -88,8 +88,6 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/school_service_db
     depends_on:
-      mongo:
-        condition: service_healthy
       eureka:
         condition: service_started
     networks:
