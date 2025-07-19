@@ -76,9 +76,8 @@ public class OrderServiceImpl implements OrderService {
         order.setPrice(orderRequestDto.getAmount());
         order.setStatus("PENDING");
         order.setUpdatedAt(now());
-//        order.setExpiredDate(now().plusDays(30)); // Assuming orders expire in 1 day
-        order.setExpiredDate(now().plusMinutes(2)); // Assuming orders expire in 1 day
-
+        order.setExpiredDate(now().plusDays(30)); // Assuming orders expire in 1 day
+//        order.setExpiredDate(now().plusMinutes(2));
         return orderRepository.save(order);
     }
 
