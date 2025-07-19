@@ -1,8 +1,10 @@
 name: Deploy Microservices with Docker Compose
 
 on:
-  merge_group:
-    branches: [ "master" ]
+  pull_request:
+    types: [closed]
+    branches:
+      - master
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
