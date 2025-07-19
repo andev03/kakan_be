@@ -91,8 +91,8 @@ public class SecurityConfig {
 
             if (accountResponse == null) {
                 // Nếu tài khoản bị vô hiệu hóa, chuyển hướng với thông báo lỗi
-//                String redirectUrl = "https://nguyenhoangan.site/login/success?error=disabled";
-                String redirectUrl = frontendUrl + "/login/success?error=disabled";
+                String redirectUrl = "https://nguyenhoangan.site/login/success?error=disabled";
+//                String redirectUrl = frontendUrl + "/login/success?error=disabled";
 
                 response.sendRedirect(redirectUrl);
                 return;
@@ -102,13 +102,12 @@ public class SecurityConfig {
             String encodedToken = URLEncoder.encode(accountResponse.getToken(), "UTF-8");
             String encodedUsername = URLEncoder.encode(accountResponse.getUserName(), "UTF-8");
             String role = URLEncoder.encode(accountResponse.getRole(), "UTF-8");
+            String encodedId = URLEncoder.encode(String.valueOf(accountResponse.getId()), "UTF-8");
 
-//            String redirectUrl = "https://nguyenhoangan.site/login/success?token=" +
-//                    encodedToken + "&username=" + encodedUsername + "&role=" + role;
-            String redirectUrl = frontendUrl + "/login/success?token=" +
-
-                    encodedToken + "&username=" + encodedUsername + "&role=" + role;
-            response.sendRedirect(redirectUrl);
+            String redirectUrl = "https://nguyenhoangan.site/login/success?token=" +
+                    encodedToken + "&username=" + encodedUsername + "&role=" + role + "id=" + encodedId;
+//            String redirectUrl = frontendUrl + "/login/success?token=" +
+//                    encodedToken + "&username=" + encodedUsername + "&role=" + role + "id=" + encodedId;
 
 //            Map<String, String> tokenMap = new HashMap<>();
 //            tokenMap.put("access_token", accountResponse.getToken());
