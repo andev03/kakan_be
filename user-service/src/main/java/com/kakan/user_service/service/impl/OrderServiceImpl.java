@@ -30,5 +30,12 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    public void updateRoleStudent(OrderStatusRequest orderStatusRequest) {
+        int updated = accountRepository.updateRoleById(orderStatusRequest.getAccountId(), AccountRole.STUDENT.name());
+        if (updated == 0) {
+            throw new EntityNotFoundException("Account not found with ID: " + orderStatusRequest.getAccountId());
+        }
+    }
+
 
 }

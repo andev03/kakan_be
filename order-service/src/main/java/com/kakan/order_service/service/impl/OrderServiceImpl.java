@@ -64,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
             orderDto.setOrderId(foundOrder.getOrderId());
             orderDto.setOrderDate(foundOrder.getOrderDate());
             orderDto.setExpiredDate(foundOrder.getExpiredDate());
+            orderDto.setStatus(foundOrder.getStatus());
         } else {
             throw new EntityNotFoundException("Order not found for account ID: " + accountId);
         }
