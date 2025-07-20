@@ -129,6 +129,7 @@ public class AuthenticationServiceImpl implements UserDetailsService {
         // Trả về thông tin người dùng, role và token
         AccountResponse response = new AccountResponse();
         if(account.getIsActive()){
+            response.setId(account.getId());
             response.setUserName(account.getUserName());
             response.setEmail(account.getEmail());
             response.setRole(account.getRole());  // Trả về role của người dùng
