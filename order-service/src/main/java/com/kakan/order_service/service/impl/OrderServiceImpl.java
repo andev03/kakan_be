@@ -57,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto getOrderByAccountId(int accountId) {
-        Optional<Order> order = orderRepository.findByAccountId(accountId);
+        Optional<Order> order = orderRepository.findByAccountIdAndStatus(accountId, "PENDING");
         OrderDto orderDto = new OrderDto();
         if (order.isPresent()) {
             Order foundOrder = order.get();
