@@ -33,10 +33,6 @@ public class AuthenticationServiceImpl implements UserDetailsService {
     @Autowired
     AccountRepository accountRepository;
 
-
-
-
-
     @Autowired
     ModelMapper modelMapper;
 
@@ -47,8 +43,6 @@ public class AuthenticationServiceImpl implements UserDetailsService {
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
     @Autowired
     private TokenService tokenService;
-
-
 
     public AccountResponse register (RegisterRequest registerRequest) {
         try {
@@ -94,8 +88,6 @@ public class AuthenticationServiceImpl implements UserDetailsService {
             throw new RuntimeException("Đã xảy ra lỗi không xác định: " + e.getMessage());
         }
     }
-
-
 
     public void logout(String token) {
         tokenService.invalidateToken(token);
@@ -154,7 +146,7 @@ public class AuthenticationServiceImpl implements UserDetailsService {
             account.setPassword(passwordEncoder.encode(email));         // hoặc null, vì dùng OAuth2
             account.setIsActive(true);
             account.setRole("STUDENT");         // default role
-            accountRepository.save(account);
+            account = accountRepository.save(account);
 
             UserInformation userInformation = new UserInformation();
             userInformation.setAccount(account);
@@ -179,7 +171,6 @@ public class AuthenticationServiceImpl implements UserDetailsService {
         return null;
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Account account = accountRepository.findAccountByUserName(userName);
@@ -188,9 +179,4 @@ public class AuthenticationServiceImpl implements UserDetailsService {
         }
         return new UserPrincipal(account);
     }
-
-
-
-
-
 }
