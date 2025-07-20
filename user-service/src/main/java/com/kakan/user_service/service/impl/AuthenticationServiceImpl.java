@@ -146,7 +146,7 @@ public class AuthenticationServiceImpl implements UserDetailsService {
             account.setPassword(passwordEncoder.encode(email));         // hoặc null, vì dùng OAuth2
             account.setIsActive(true);
             account.setRole("STUDENT");         // default role
-            account = accountRepository.save(account);
+            accountRepository.save(account);
 
             UserInformation userInformation = new UserInformation();
             userInformation.setAccount(account);

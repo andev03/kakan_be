@@ -105,7 +105,7 @@ public class SecurityConfig {
             String encodedId = URLEncoder.encode(String.valueOf(accountResponse.getId()), "UTF-8");
 
             String redirectUrl = "https://nguyenhoangan.site/login/success?token=" +
-                    encodedToken + "&username=" + encodedUsername + "&role=" + role + "id=" + encodedId;
+                    encodedToken + "&username=" + encodedUsername + "&role=" + role + "&id=" + encodedId;
 //            String redirectUrl = frontendUrl + "/login/success?token=" +
 //                    encodedToken + "&username=" + encodedUsername + "&role=" + role + "id=" + encodedId;
             response.sendRedirect(redirectUrl);
