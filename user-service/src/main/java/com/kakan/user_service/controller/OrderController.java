@@ -26,7 +26,7 @@ public class OrderController {
     @PostMapping("/updateRole/student")
     public ResponseDto updateRoleStudent(@RequestBody OrderStatusRequest orderStatusRequest) {
 
-        orderService.updateRole(orderStatusRequest);
+        orderService.updateRoleStudent(orderStatusRequest);
         return new ResponseDto(HttpStatus.OK.value(), "Role updated successfully", null);
     }
 
