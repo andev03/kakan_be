@@ -26,11 +26,11 @@ public class Order {
     private String status;
 
     @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt = OffsetDateTime.now();
+    private OffsetDateTime updatedAt;
 
     @Column(name = "order_date", nullable = false)
     private OffsetDateTime orderDate = OffsetDateTime.now();
 
     @Column(name = "expired_date", nullable = false)
-    private OffsetDateTime expiredDate = OffsetDateTime.now();
+    private OffsetDateTime expiredDate ;
 }

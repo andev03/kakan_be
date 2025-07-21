@@ -1,6 +1,9 @@
 name: Deploy Microservices with Docker Compose
 
 on:
+  push:
+    branches: [ "release" ]
+
   pull_request:
     types: [closed]
     branches:

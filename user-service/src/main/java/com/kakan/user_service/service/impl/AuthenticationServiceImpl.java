@@ -33,10 +33,6 @@ public class AuthenticationServiceImpl implements UserDetailsService {
     @Autowired
     AccountRepository accountRepository;
 
-
-
-
-
     @Autowired
     ModelMapper modelMapper;
 
@@ -47,8 +43,6 @@ public class AuthenticationServiceImpl implements UserDetailsService {
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
     @Autowired
     private TokenService tokenService;
-
-
 
     public AccountResponse register (RegisterRequest registerRequest) {
         try {
@@ -95,8 +89,6 @@ public class AuthenticationServiceImpl implements UserDetailsService {
         }
     }
 
-
-
     public void logout(String token) {
         tokenService.invalidateToken(token);
     }
@@ -129,6 +121,7 @@ public class AuthenticationServiceImpl implements UserDetailsService {
         // Trả về thông tin người dùng, role và token
         AccountResponse response = new AccountResponse();
         if(account.getIsActive()){
+            response.setId(account.getId());
             response.setUserName(account.getUserName());
             response.setEmail(account.getEmail());
             response.setRole(account.getRole());  // Trả về role của người dùng
@@ -178,7 +171,6 @@ public class AuthenticationServiceImpl implements UserDetailsService {
         return null;
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Account account = accountRepository.findAccountByUserName(userName);
@@ -187,9 +179,4 @@ public class AuthenticationServiceImpl implements UserDetailsService {
         }
         return new UserPrincipal(account);
     }
-
-
-
-
-
 }

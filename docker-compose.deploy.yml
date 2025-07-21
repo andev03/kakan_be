@@ -53,6 +53,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/admission_advisor_db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
+      TZ: Asia/Ho_Chi_Minh
     depends_on:
       postgres:
         condition: service_healthy
@@ -71,6 +72,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/forum_service_db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
+      TZ: Asia/Ho_Chi_Minh
     depends_on:
       postgres:
         condition: service_healthy
@@ -87,6 +89,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/school_service_db
+      TZ: Asia/Ho_Chi_Minh
     depends_on:
       eureka:
         condition: service_started
@@ -103,6 +106,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/user_service_db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
+      TZ: Asia/Ho_Chi_Minh
     depends_on:
       postgres:
         condition: service_healthy
@@ -121,6 +125,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/order_service_db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 12345
+      TZ: Asia/Ho_Chi_Minh
     depends_on:
       postgres:
         condition: service_healthy
