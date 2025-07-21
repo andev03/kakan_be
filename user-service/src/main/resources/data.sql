@@ -10,7 +10,7 @@ INSERT INTO account (user_name, email, password, is_active, role)
 VALUES ('alice', 'alice@example.com', '$2a$12$FsEQT3Zw0PeNv7iW5jmsF.6BZ70WKzIkdpqThESAnE.G2FhgvVoy6', TRUE, 'STUDENT'),
        ('Bob', 'bob@example.com', '$2a$12$hgpOZw7bTi1Ky796XgJDMOsjh4oWeSRkaHVn71EgeO1xc4rA/TeGG', TRUE, 'STUDENT'),
        ('Nhat An', 'nhatan@example.com', '$2a$12$s0oTQbQkFQvW96GtQBsFbunQ7SkfqYikaw9LuLZp3Sq1QhYniVnJu', TRUE,
-        'PREMIUM'),
+        'STAFF'),
        ('Admin', 'admin@mysite.com', '$2a$12$F9xihGUaaA9eyKkdAOVwwOhUZkzEjQP0WzbR8HCUWraeE/7.fLIci', TRUE, 'ADMIN');
 
 -- user_information
